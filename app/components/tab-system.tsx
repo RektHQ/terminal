@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useTheme } from "../contexts/theme-context"
-import { X, ChevronLeft, ChevronRight } from "lucide-react"
 import { useIsMobile } from "../hooks/use-mobile"
 
 interface Tab {
@@ -12,23 +11,26 @@ interface Tab {
   title: string
   content: React.ReactNode
   closable?: boolean
+  icon?: React.ComponentType<any>
+  label?: string
 }
 
+// Update the component props to include className:
 interface TabSystemProps {
   tabs: Tab[]
-  defaultActiveTab?: string
-  onTabClose?: (tabId: string) => void
-  onTabChange?: (tabId: string) => void
+  activeTab: string
+  onTabChange: (tabId: string) => void
+  className?: string
 }
 
-export function TabSystem({ tabs, defaultActiveTab, onTabClose, onTabChange }: TabSystemProps) {
+export function TabSystem({ tabs, activeTab, onTabChange, className = "" }: TabSystemProps) {
   const { theme } = useTheme()
-  const [activeTab, setActiveTab] = useState(defaultActiveTab || (tabs.length > 0 ? tabs[0].id : ""))
+  //const [activeTab, setActiveTab] = useState(defaultActiveTab || (tabs.length > 0 ? tabs[0].id : ""))
   const [scrollPosition, setScrollPosition] = useState(0)
   const tabsContainerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
 
-  const handleTabChange = (tabId: string) => {
+  /*const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
     if (onTabChange) {
       onTabChange(tabId)
@@ -51,7 +53,7 @@ export function TabSystem({ tabs, defaultActiveTab, onTabClose, onTabChange }: T
     theme === "hacker"
       ? "bg-gray-900 hover:bg-black text-green-500 hover:text-green-400"
       : "bg-gray-900 hover:bg-black text-gray-300 hover:text-white"
-
+*/
   // Scroll tabs left/right
   const scrollLeft = () => {
     if (tabsContainerRef.current) {
@@ -82,54 +84,30 @@ export function TabSystem({ tabs, defaultActiveTab, onTabClose, onTabChange }: T
     }
   }, [activeTab, tabs])
 
+  const activeTabContent = tabs.find((tab) => tab.id === activeTab)?.content || null
+
+  // Update the return statement to use the className prop:
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex bg-gray-900 border-b border-gray-800 relative">
-        {/* Scroll buttons for mobile */}
-        {isMobile && tabs.length > 2 && (
-          <button className="absolute left-0 top-0 bottom-0 z-10 px-1 bg-black/70 text-gray-400" onClick={scrollLeft}>
-            <ChevronLeft size={16} />
-          </button>
-        )}
-
-        <div
-          ref={tabsContainerRef}
-          className="flex overflow-x-auto scrollbar-hide flex-1"
-          style={{ scrollBehavior: "smooth" }}
-        >
-          {tabs.map((tab) => (
-            <div
-              key={tab.id}
-              data-tab-id={tab.id}
-              className={`px-3 py-2 cursor-pointer flex items-center whitespace-nowrap ${
-                activeTab === tab.id ? activeTabClass : inactiveTabClass
-              }`}
-              onClick={() => handleTabChange(tab.id)}
-            >
-              <span className="truncate max-w-[150px] md:max-w-[200px]">{tab.title}</span>
-              {tab.closable && (
-                <button className="ml-2 text-gray-500 hover:text-gray-300" onClick={(e) => handleTabClose(e, tab.id)}>
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Scroll buttons for mobile */}
-        {isMobile && tabs.length > 2 && (
-          <button className="absolute right-0 top-0 bottom-0 z-10 px-1 bg-black/70 text-gray-400" onClick={scrollRight}>
-            <ChevronRight size={16} />
-          </button>
-        )}
-      </div>
-      <div className="flex-1 overflow-auto">
+    <div className={`flex flex-col ${className || ""}`}>
+      <div className="flex border-b border-gray-800">
         {tabs.map((tab) => (
-          <div key={tab.id} className={`h-full ${activeTab === tab.id ? "block" : "hidden"}`}>
-            {tab.content}
-          </div>
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            className={`px-4 py-2 text-sm font-medium ${
+              activeTab === tab.id
+                ? theme === "hacker"
+                  ? "bg-green-900/20 text-green-500 border-b-2 border-green-500"
+                  : "bg-gray-900 text-white border-b-2 border-white"
+                : "text-gray-400 hover:text-gray-300"
+            }`}
+          >
+            {tab.icon && <tab.icon size={14} className="inline mr-2" />}
+            {tab.label}
+          </button>
         ))}
       </div>
+      <div className="flex-1 overflow-auto">{activeTabContent}</div>
     </div>
   )
 }

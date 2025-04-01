@@ -31,12 +31,13 @@ export function RektAIAssistant({
   const { theme } = useTheme()
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  // Update the initial welcome message to be more specific about Rekt News knowledge
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "assistant",
       content:
-        "Welcome to RektGPT. I'm trained on all Rekt News articles, on-chain data, and security incidents. How can I help you today?",
+        "Welcome to RektGPT. I'm trained on all Rekt News articles, on-chain data, and security incidents since 2020. I can provide insights on exploits, vulnerabilities, and DeFi security trends. How can I help you today?",
       timestamp: new Date(),
     },
   ])
@@ -49,6 +50,7 @@ export function RektAIAssistant({
     }
   }, [messages])
 
+  // Update the handleSubmit function to include more specific responses about Rekt News content
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
@@ -64,22 +66,31 @@ export function RektAIAssistant({
     setInput("")
     setIsLoading(true)
 
-    // Simulate AI response
+    // Simulate AI response with more specific knowledge about Rekt News content
     setTimeout(() => {
       let response = ""
 
       if (input.toLowerCase().includes("euler")) {
         response =
-          "The Euler Finance hack occurred on March 13, 2023. The attacker exploited a vulnerability in Euler's liquidation logic to steal approximately $197M. The attack used a flash loan to manipulate collateral values and drain funds across multiple tokens. The hacker later returned most of the funds after negotiations with the Euler team."
+          "The Euler Finance hack occurred on March 13, 2023. The attacker exploited a vulnerability in Euler's liquidation logic to steal approximately $197M. The attack used a flash loan to manipulate collateral values and drain funds across multiple tokens. Rekt News covered this extensively, noting that despite multiple audits from top firms, the vulnerability remained undetected. The hacker later returned most of the funds after negotiations with the Euler team, which is a pattern we've seen in about 15% of major exploits since 2021."
       } else if (input.toLowerCase().includes("risk") && input.toLowerCase().includes("lido")) {
         response =
-          "Lido's current risk profile shows moderate centralization concerns with its validator set, though improvements have been made in the past 30 days. The protocol holds approximately 32% of all staked ETH, creating systemic risk. Recent governance proposals have focused on improving validator diversity and implementing additional security measures for the stETH/ETH peg."
+          "Lido's current risk profile shows moderate centralization concerns with its validator set, though improvements have been made in the past 30 days. The protocol holds approximately 32% of all staked ETH, creating systemic risk that Rekt News has highlighted in several articles. Recent governance proposals have focused on improving validator diversity and implementing additional security measures for the stETH/ETH peg. Rekt's analysis suggests that while Lido has strong security practices, its dominance in liquid staking creates ecosystem-wide vulnerabilities that could affect multiple protocols if compromised."
       } else if (input.toLowerCase().includes("tornado") || input.toLowerCase().includes("cash")) {
         response =
-          "Tornado Cash was sanctioned by OFAC in August 2022. Since then, we've tracked significant changes in privacy protocol usage. In the past 30 days, approximately 24,500 ETH has moved through alternative privacy solutions. Several wallets previously associated with Tornado Cash have shown activity bridging to Layer 2s and using newer privacy protocols."
+          "Tornado Cash was sanctioned by OFAC in August 2022, a watershed moment that Rekt News covered extensively. Our analysis showed that privacy tools are essential infrastructure but can be weaponized. Since the sanctions, we've tracked significant changes in privacy protocol usage. In the past 30 days, approximately 24,500 ETH has moved through alternative privacy solutions. Several wallets previously associated with Tornado Cash have shown activity bridging to Layer 2s and using newer privacy protocols. Rekt's coverage of this issue has highlighted the tension between regulatory compliance and DeFi's core value of censorship resistance."
+      } else if (input.toLowerCase().includes("flash loan") || input.toLowerCase().includes("flashloan")) {
+        response =
+          "Flash loan attacks remain one of the most common exploit vectors in DeFi, accounting for 42% of all exploits covered by Rekt News in the past 6 months. The typical pattern involves borrowing large amounts of assets without collateral within a single transaction, manipulating market prices or oracle data, and then exploiting these price discrepancies. Rekt's analysis shows that protocols with single oracle dependencies and inadequate circuit breakers are particularly vulnerable. Recent examples include the FlashLender Protocol exploit ($18.5M) and YieldBooster ($7.2M), both of which followed this pattern despite numerous historical precedents."
+      } else if (input.toLowerCase().includes("bridge") || input.toLowerCase().includes("cross-chain")) {
+        response =
+          "Cross-chain bridges remain one of the highest-risk components in DeFi architecture. Rekt News has documented over $2.5B lost in bridge exploits since 2021, including the Ronin ($625M), Wormhole ($325M), and Poly Network ($611M) hacks. The fundamental security challenge is that bridges must maintain state across multiple chains, creating complex attack surfaces. Our analysis shows that 78% of bridge exploits involve validator compromise or signature verification failures. The recent trend toward zero-knowledge proofs for bridge security is promising but still unproven at scale."
+      } else if (input.toLowerCase().includes("rekt news") || input.toLowerCase().includes("about rekt")) {
+        response =
+          "Rekt News has been the leading independent publication covering DeFi security incidents since 2020. We've documented over 350 major exploits totaling more than $6.8B in losses. Our approach combines technical analysis with a distinctive voice that doesn't pull punches. Beyond just reporting incidents, we track patterns across exploits, maintain relationships with security researchers, and often publish exclusive post-mortems. The Rekt Leaderboard ranks protocols by the severity of their security incidents, with Ronin, Poly Network, and Wormhole currently holding the unfortunate top positions."
       } else {
         response =
-          "Based on my analysis of recent on-chain data and security incidents, I'd recommend focusing on cross-chain bridge security and oracle manipulation vectors. These have been the primary attack vectors in recent months, with over $350M lost to bridge exploits in the past year alone."
+          "Based on Rekt News' analysis of recent on-chain data and security incidents, I'd recommend focusing on cross-chain bridge security and oracle manipulation vectors. These have been the primary attack vectors in recent months, with over $350M lost to bridge exploits in the past year alone. Our data shows that protocols with multiple oracle sources and circuit breakers have 73% fewer exploits than those with single price feeds. The recent trend of flash loan attacks targeting lending protocols suggests implementing rate limiting and time-weighted average prices could significantly reduce risk exposure."
       }
 
       const assistantMessage: Message = {

@@ -24,6 +24,11 @@ interface ExploitVictim {
   type: string
   status: "ongoing" | "confirmed" | "suspected"
   rektTake: string
+  riskFactors: string[]
+  tvl: number
+  tvlImpact: number
+  recoveryChance: "Low" | "Medium" | "High"
+  similarExploits: number
 }
 
 interface RugAlert {
@@ -110,6 +115,11 @@ const mockExploitVictims: ExploitVictim[] = [
     status: "ongoing",
     rektTake:
       "Another day, another DeFi protocol that didn't understand how their own code works. The attacker is currently draining funds while the team 'investigates'.",
+    riskFactors: ["No circuit breaker", "Unaudited code", "Complex flash loan logic"],
+    tvl: 65000000,
+    tvlImpact: 28.5,
+    recoveryChance: "Low",
+    similarExploits: 7,
   },
   {
     protocol: "YieldBooster",
@@ -119,6 +129,11 @@ const mockExploitVictims: ExploitVictim[] = [
     status: "confirmed",
     rektTake:
       "YieldBooster's team was warned about their oracle vulnerability three months ago on their forum. They ignored it. Now they're paying the price.",
+    riskFactors: ["Single oracle dependency", "Ignored security warnings", "No price deviation checks"],
+    tvl: 42000000,
+    tvlImpact: 17.1,
+    recoveryChance: "Medium",
+    similarExploits: 12,
   },
   {
     protocol: "MetaVault",
@@ -128,6 +143,11 @@ const mockExploitVictims: ExploitVictim[] = [
     status: "confirmed",
     rektTake:
       "Rookie mistake. Their admin function had no access control. It's like leaving your front door wide open with a sign saying 'valuables inside'.",
+    riskFactors: ["Missing access controls", "No multi-sig", "Inadequate testing"],
+    tvl: 28000000,
+    tvlImpact: 16.1,
+    recoveryChance: "High",
+    similarExploits: 23,
   },
 ]
 
@@ -165,39 +185,67 @@ export function RektRadar() {
   const [activeSection, setActiveSection] = useState<"protocols" | "shameboard" | "rugalerts">("shameboard")
 
   const getRiskColor = (score: number) => {
-    if (score >= 70) {
-      return theme === "hacker" ? "text-red-500" : "text-red-400"
-    } else if (score >= 50) {
-      return theme === "hacker" ? "text-yellow-500" : "text-yellow-400"
+    if (theme === "hacker") {
+      if (score >= 70) {
+        return "text-red-500"
+      } else if (score >= 50) {
+        return "text-yellow-500"
+      } else {
+        return "text-green-500"
+      }
     } else {
-      return theme === "hacker" ? "text-green-500" : "text-green-400"
+      // In rekt theme, use only black and white
+      if (score >= 70) {
+        return "text-white font-bold"
+      } else if (score >= 50) {
+        return "text-gray-300"
+      } else {
+        return "text-gray-400"
+      }
     }
   }
 
   const getWouldYouTouchColor = (score: number) => {
-    if (score <= 3) {
-      return theme === "hacker" ? "text-red-500" : "text-red-400"
-    } else if (score <= 6) {
-      return theme === "hacker" ? "text-yellow-500" : "text-yellow-400"
+    if (theme === "hacker") {
+      if (score <= 3) {
+        return "text-red-500"
+      } else if (score <= 6) {
+        return "text-yellow-500"
+      } else {
+        return "text-green-500"
+      }
     } else {
-      return theme === "hacker" ? "text-green-500" : "text-green-400"
+      // In rekt theme, use only black and white
+      if (score <= 3) {
+        return "text-white font-bold"
+      } else if (score <= 6) {
+        return "text-gray-300"
+      } else {
+        return "text-gray-400"
+      }
     }
   }
 
   const getSentimentIcon = (sentiment: string) => {
-    switch (sentiment) {
-      case "bearish":
-        return <TrendingDown size={16} className={theme === "hacker" ? "text-red-500" : "text-red-400"} />
-      case "bullish":
-        return (
-          <TrendingDown
-            size={16}
-            className={theme === "hacker" ? "text-green-500" : "text-green-400"}
-            transform="rotate(180)"
-          />
-        )
-      default:
-        return <TrendingDown size={16} className="text-gray-400" transform="rotate(90)" />
+    if (theme === "hacker") {
+      switch (sentiment) {
+        case "bearish":
+          return <TrendingDown size={16} className="text-red-500" />
+        case "bullish":
+          return <TrendingDown size={16} className="text-green-500" transform="rotate(180)" />
+        default:
+          return <TrendingDown size={16} className="text-gray-400" transform="rotate(90)" />
+      }
+    } else {
+      // In rekt theme, use only black and white
+      switch (sentiment) {
+        case "bearish":
+          return <TrendingDown size={16} className="text-white" />
+        case "bullish":
+          return <TrendingDown size={16} className="text-white" transform="rotate(180)" />
+        default:
+          return <TrendingDown size={16} className="text-gray-400" transform="rotate(90)" />
+      }
     }
   }
 
@@ -212,14 +260,14 @@ export function RektRadar() {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-2 border-b border-gray-800 flex space-x-2">
+    <div className="h-full overflow-auto bg-black text-white">
+      <div className="sticky top-0 z-10 bg-black p-2 border-b border-gray-800 flex space-x-2">
         <button
           className={`px-3 py-1 rounded text-xs flex items-center ${
             activeSection === "shameboard"
               ? theme === "hacker"
                 ? "bg-red-900/30 text-red-500"
-                : "bg-red-900/30 text-red-400"
+                : "bg-gray-800 text-white"
               : "text-gray-400"
           }`}
           onClick={() => setActiveSection("shameboard")}
@@ -232,20 +280,20 @@ export function RektRadar() {
             activeSection === "protocols"
               ? theme === "hacker"
                 ? "bg-green-900/30 text-green-500"
-                : "bg-blue-900/30 text-blue-400"
+                : "bg-gray-800 text-white"
               : "text-gray-400"
           }`}
           onClick={() => setActiveSection("protocols")}
         >
           <Shield size={14} className="mr-1" />
-          PROTOCOL RISK RADAR
+          PROTOCOL RISK
         </button>
         <button
           className={`px-3 py-1 rounded text-xs flex items-center ${
             activeSection === "rugalerts"
               ? theme === "hacker"
                 ? "bg-yellow-900/30 text-yellow-500"
-                : "bg-yellow-900/30 text-yellow-400"
+                : "bg-gray-800 text-white"
               : "text-gray-400"
           }`}
           onClick={() => setActiveSection("rugalerts")}
@@ -255,13 +303,13 @@ export function RektRadar() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-auto">
+      <div className="p-4">
         {activeSection === "shameboard" && (
-          <div className="p-4">
+          <>
             <div className="flex items-center mb-4">
-              <Skull size={20} className={theme === "hacker" ? "text-red-500 mr-2" : "text-red-400 mr-2"} />
-              <h2 className={`text-lg font-bold ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
-                SHAMEBOARD: RECENT EXPLOIT VICTIMS
+              <Skull size={18} className={theme === "hacker" ? "text-red-500 mr-2" : "text-white mr-2"} />
+              <h2 className={`text-base font-bold ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
+                RECENT EXPLOIT VICTIMS
               </h2>
             </div>
 
@@ -270,41 +318,92 @@ export function RektRadar() {
                 <div key={index} className="border border-gray-800 rounded-md p-4 bg-black/30">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className={`text-lg font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+                      <h3 className={`text-xl font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
                         {victim.protocol}
                       </h3>
                       <div className="flex items-center mt-1">
                         <span
-                          className={`px-2 py-0.5 rounded text-xs ${
+                          className={`px-2 py-0.5 rounded text-xs uppercase ${
                             victim.status === "ongoing"
-                              ? "bg-red-900/30 text-red-500"
-                              : victim.status === "confirmed"
-                                ? "bg-yellow-900/30 text-yellow-500"
-                                : "bg-blue-900/30 text-blue-500"
+                              ? theme === "hacker"
+                                ? "bg-red-900/30 text-red-500"
+                                : "bg-gray-900 text-red-400"
+                              : "bg-gray-900 text-gray-400"
                           }`}
                         >
-                          {victim.status.toUpperCase()}
+                          {victim.status}
                         </span>
-                        <span className="text-gray-400 text-sm ml-2">{victim.date}</span>
+                        <span className="text-gray-400 text-xs ml-2">{victim.date}</span>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className={`text-xl font-bold ${theme === "hacker" ? "text-red-500" : "text-red-400"}`}>
                         {formatMoney(victim.amount)}
                       </div>
-                      <div className="text-gray-400 text-sm">{victim.type}</div>
+                      <div className="text-gray-400 text-xs">{victim.type}</div>
                     </div>
                   </div>
 
-                  <div className="mt-4 border-t border-gray-800 pt-3">
+                  <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <div className="text-xs text-gray-400 mb-1">RISK FACTORS:</div>
+                      <div className="flex flex-wrap gap-1">
+                        {victim.riskFactors.map((factor, i) => (
+                          <span key={i} className="px-2 py-0.5 rounded-md text-xs bg-gray-900 text-gray-300">
+                            {factor}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-xs text-gray-400 mb-1">TVL IMPACT:</div>
+                      <div className="flex items-center">
+                        <div className="w-full bg-gray-800 rounded-full h-1.5 mr-2">
+                          <div
+                            className={`${theme === "hacker" ? "bg-red-500" : "bg-white"} h-1.5 rounded-full`}
+                            style={{ width: `${victim.tvlImpact}%` }}
+                          ></div>
+                        </div>
+                        <span className={`text-xs ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
+                          {victim.tvlImpact}%
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        {formatMoney(victim.amount)} of {formatMoney(victim.tvl)} TVL
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-xs text-gray-400 mb-1">RECOVERY CHANCE:</div>
+                      <div className="flex items-center">
+                        <div
+                          className={`w-2 h-2 rounded-full mr-1 ${
+                            victim.recoveryChance === "Low"
+                              ? "bg-red-500"
+                              : victim.recoveryChance === "Medium"
+                                ? "bg-yellow-500"
+                                : "bg-green-500"
+                          }`}
+                        ></div>
+                        <span className={`text-xs ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+                          {victim.recoveryChance} ({victim.similarExploits} similar cases)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 border-t border-gray-800 pt-2">
                     <div className="flex items-start">
-                      <MessageSquare
-                        size={16}
-                        className={theme === "hacker" ? "text-red-500 mr-2 mt-1" : "text-red-400 mr-2 mt-1"}
-                      />
+                      <div className="flex-shrink-0 mt-1">
+                        <MessageSquare
+                          size={14}
+                          className={theme === "hacker" ? "text-red-500 mr-2" : "text-gray-400 mr-2"}
+                        />
+                      </div>
                       <div>
                         <div className="text-xs text-gray-400 mb-1">REKT TAKE:</div>
-                        <div className={`${theme === "hacker" ? "text-green-500" : "text-white"} italic`}>
+                        <div className={`${theme === "hacker" ? "text-green-500" : "text-white"} text-sm italic`}>
                           "{victim.rektTake}"
                         </div>
                       </div>
@@ -316,76 +415,76 @@ export function RektRadar() {
 
             <div className="mt-6 border-t border-gray-800 pt-4">
               <div className="flex items-center mb-4">
-                <BarChart3 size={20} className={theme === "hacker" ? "text-yellow-500 mr-2" : "text-yellow-400 mr-2"} />
-                <h2 className={`text-lg font-bold ${theme === "hacker" ? "text-yellow-500" : "text-white"}`}>
+                <BarChart3 size={18} className={theme === "hacker" ? "text-yellow-500 mr-2" : "text-gray-300 mr-2"} />
+                <h2 className={`text-base font-bold ${theme === "hacker" ? "text-yellow-500" : "text-white"}`}>
                   EXPLOIT BREAKDOWN
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="border border-gray-800 rounded-md p-4 bg-black/30">
-                  <h3 className="text-gray-400 mb-2">EXPLOIT TYPES (LAST 30 DAYS)</h3>
+                  <h3 className="text-xs text-gray-400 mb-2">EXPLOIT TYPES (LAST 30 DAYS)</h3>
                   <div className="space-y-2">
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs mb-1">
                         <span className={theme === "hacker" ? "text-green-500" : "text-white"}>Flash Loan Attacks</span>
                         <span className="text-gray-400">42%</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
+                      <div className="w-full bg-gray-800 rounded-full h-1.5">
                         <div
-                          className={`${theme === "hacker" ? "bg-red-500" : "bg-red-400"} h-2 rounded-full`}
+                          className={`${theme === "hacker" ? "bg-red-500" : "bg-white"} h-1.5 rounded-full`}
                           style={{ width: "42%" }}
                         ></div>
                       </div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs mb-1">
                         <span className={theme === "hacker" ? "text-green-500" : "text-white"}>
                           Oracle Manipulation
                         </span>
                         <span className="text-gray-400">27%</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
+                      <div className="w-full bg-gray-800 rounded-full h-1.5">
                         <div
-                          className={`${theme === "hacker" ? "bg-red-500" : "bg-red-400"} h-2 rounded-full`}
+                          className={`${theme === "hacker" ? "bg-red-500" : "bg-white"} h-1.5 rounded-full`}
                           style={{ width: "27%" }}
                         ></div>
                       </div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs mb-1">
                         <span className={theme === "hacker" ? "text-green-500" : "text-white"}>
                           Access Control Failures
                         </span>
                         <span className="text-gray-400">15%</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
+                      <div className="w-full bg-gray-800 rounded-full h-1.5">
                         <div
-                          className={`${theme === "hacker" ? "bg-red-500" : "bg-red-400"} h-2 rounded-full`}
+                          className={`${theme === "hacker" ? "bg-red-500" : "bg-white"} h-1.5 rounded-full`}
                           style={{ width: "15%" }}
                         ></div>
                       </div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs mb-1">
                         <span className={theme === "hacker" ? "text-green-500" : "text-white"}>Reentrancy</span>
                         <span className="text-gray-400">10%</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
+                      <div className="w-full bg-gray-800 rounded-full h-1.5">
                         <div
-                          className={`${theme === "hacker" ? "bg-red-500" : "bg-red-400"} h-2 rounded-full`}
+                          className={`${theme === "hacker" ? "bg-red-500" : "bg-white"} h-1.5 rounded-full`}
                           style={{ width: "10%" }}
                         ></div>
                       </div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs mb-1">
                         <span className={theme === "hacker" ? "text-green-500" : "text-white"}>Other</span>
                         <span className="text-gray-400">6%</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
+                      <div className="w-full bg-gray-800 rounded-full h-1.5">
                         <div
-                          className={`${theme === "hacker" ? "bg-red-500" : "bg-red-400"} h-2 rounded-full`}
+                          className={`${theme === "hacker" ? "bg-red-500" : "bg-white"} h-1.5 rounded-full`}
                           style={{ width: "6%" }}
                         ></div>
                       </div>
@@ -394,45 +493,45 @@ export function RektRadar() {
                 </div>
 
                 <div className="border border-gray-800 rounded-md p-4 bg-black/30">
-                  <h3 className="text-gray-400 mb-2">FUNDS LOST (LAST 30 DAYS)</h3>
-                  <div className="text-3xl font-bold mb-2 flex items-baseline">
-                    <span className={theme === "hacker" ? "text-red-500" : "text-red-400"}>$142.7M</span>
-                    <span className="text-sm text-gray-400 ml-2">+23% from previous month</span>
+                  <h3 className="text-xs text-gray-400 mb-2">FUNDS LOST (LAST 30 DAYS)</h3>
+                  <div className="text-2xl font-bold mb-2 flex items-baseline">
+                    <span className={theme === "hacker" ? "text-red-500" : "text-white"}>$142.7M</span>
+                    <span className="text-xs text-gray-400 ml-2">+23% from previous month</span>
                   </div>
 
                   <div className="space-y-2 mt-4">
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs mb-1">
                         <span className={theme === "hacker" ? "text-green-500" : "text-white"}>Recovered</span>
                         <span className="text-gray-400">$18.2M (12.8%)</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
+                      <div className="w-full bg-gray-800 rounded-full h-1.5">
                         <div
-                          className={`${theme === "hacker" ? "bg-green-500" : "bg-green-400"} h-2 rounded-full`}
+                          className={`${theme === "hacker" ? "bg-green-500" : "bg-white"} h-1.5 rounded-full`}
                           style={{ width: "12.8%" }}
                         ></div>
                       </div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs mb-1">
                         <span className={theme === "hacker" ? "text-green-500" : "text-white"}>Frozen on CEXs</span>
                         <span className="text-gray-400">$31.4M (22%)</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
+                      <div className="w-full bg-gray-800 rounded-full h-1.5">
                         <div
-                          className={`${theme === "hacker" ? "bg-yellow-500" : "bg-yellow-400"} h-2 rounded-full`}
+                          className={`${theme === "hacker" ? "bg-yellow-500" : "bg-gray-300"} h-1.5 rounded-full`}
                           style={{ width: "22%" }}
                         ></div>
                       </div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs mb-1">
                         <span className={theme === "hacker" ? "text-green-500" : "text-white"}>Lost</span>
                         <span className="text-gray-400">$93.1M (65.2%)</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
+                      <div className="w-full bg-gray-800 rounded-full h-1.5">
                         <div
-                          className={`${theme === "hacker" ? "bg-red-500" : "bg-red-400"} h-2 rounded-full`}
+                          className={`${theme === "hacker" ? "bg-red-500" : "bg-white"} h-1.5 rounded-full`}
                           style={{ width: "65.2%" }}
                         ></div>
                       </div>
@@ -441,14 +540,14 @@ export function RektRadar() {
                 </div>
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {activeSection === "protocols" && (
-          <div className="p-4">
+          <>
             <div className="flex items-center mb-4">
-              <Shield size={20} className={theme === "hacker" ? "text-green-500 mr-2" : "text-blue-400 mr-2"} />
-              <h2 className={`text-lg font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+              <Shield size={18} className={theme === "hacker" ? "text-green-500 mr-2" : "text-white mr-2"} />
+              <h2 className={`text-base font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
                 PROTOCOL RISK RADAR
               </h2>
             </div>
@@ -459,30 +558,30 @@ export function RektRadar() {
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center">
-                        <h3 className={`text-lg font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+                        <h3 className={`text-xl font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
                           {protocol.name}
                         </h3>
-                        <span className="ml-2 text-gray-400">({protocol.symbol})</span>
+                        <span className="ml-2 text-gray-400 text-xs">({protocol.symbol})</span>
                       </div>
 
                       <div className="flex items-center mt-2 space-x-4">
                         <div>
                           <div className="text-xs text-gray-400">RISK SCORE</div>
-                          <div className={`text-lg font-bold ${getRiskColor(protocol.riskScore)}`}>
+                          <div className={`text-sm font-bold ${getRiskColor(protocol.riskScore)}`}>
                             {protocol.riskScore}/100
                           </div>
                         </div>
 
                         <div>
                           <div className="text-xs text-gray-400">WOULD YOU TOUCH?</div>
-                          <div className={`text-lg font-bold ${getWouldYouTouchColor(protocol.wouldYouTouchScore)}`}>
+                          <div className={`text-sm font-bold ${getWouldYouTouchColor(protocol.wouldYouTouchScore)}`}>
                             {protocol.wouldYouTouchScore}/10
                           </div>
                         </div>
 
                         <div>
                           <div className="text-xs text-gray-400">SENTIMENT</div>
-                          <div className="flex items-center">
+                          <div className="flex items-center text-sm">
                             {getSentimentIcon(protocol.sentiment)}
                             <span className="ml-1 capitalize">{protocol.sentiment}</span>
                           </div>
@@ -491,11 +590,21 @@ export function RektRadar() {
                     </div>
 
                     <div className="text-right">
-                      <div className="text-gray-400 text-sm">TVL</div>
-                      <div className={`text-lg font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+                      <div className="text-xs text-gray-400">TVL</div>
+                      <div className={`text-base font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
                         {formatMoney(protocol.tvl)}
                       </div>
-                      <div className={`text-sm ${protocol.tvlChange >= 0 ? "text-green-500" : "text-red-500"}`}>
+                      <div
+                        className={`text-xs ${
+                          protocol.tvlChange >= 0
+                            ? theme === "hacker"
+                              ? "text-green-500"
+                              : "text-white"
+                            : theme === "hacker"
+                              ? "text-red-500"
+                              : "text-gray-300"
+                        }`}
+                      >
                         {protocol.tvlChange >= 0 ? "+" : ""}
                         {protocol.tvlChange}%
                       </div>
@@ -505,9 +614,9 @@ export function RektRadar() {
                   {protocol.redFlags.length > 0 && (
                     <div className="mt-3">
                       <div className="text-xs text-gray-400 mb-1">RED FLAGS:</div>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1">
                         {protocol.redFlags.map((flag, i) => (
-                          <span key={i} className="px-2 py-1 rounded-md text-xs bg-red-900/20 text-red-500">
+                          <span key={i} className="px-2 py-0.5 rounded-md text-xs bg-gray-900 text-gray-300">
                             {flag}
                           </span>
                         ))}
@@ -517,18 +626,20 @@ export function RektRadar() {
 
                   <div className="mt-3">
                     <div className="text-xs text-gray-400 mb-1">RECENT ACTIVITY:</div>
-                    <div className="text-gray-300">{protocol.recentActivity}</div>
+                    <div className="text-xs text-gray-300">{protocol.recentActivity}</div>
                   </div>
 
-                  <div className="mt-4 border-t border-gray-800 pt-3">
+                  <div className="mt-3 border-t border-gray-800 pt-2">
                     <div className="flex items-start">
-                      <MessageSquare
-                        size={16}
-                        className={theme === "hacker" ? "text-red-500 mr-2 mt-1" : "text-red-400 mr-2 mt-1"}
-                      />
+                      <div className="flex-shrink-0 mt-1">
+                        <MessageSquare
+                          size={14}
+                          className={theme === "hacker" ? "text-red-500 mr-2" : "text-gray-400 mr-2"}
+                        />
+                      </div>
                       <div>
                         <div className="text-xs text-gray-400 mb-1">REKT TAKE:</div>
-                        <div className={`${theme === "hacker" ? "text-green-500" : "text-white"} italic`}>
+                        <div className={`${theme === "hacker" ? "text-green-500" : "text-white"} text-sm italic`}>
                           "{protocol.rektTake}"
                         </div>
                       </div>
@@ -537,17 +648,14 @@ export function RektRadar() {
                 </div>
               ))}
             </div>
-          </div>
+          </>
         )}
 
         {activeSection === "rugalerts" && (
-          <div className="p-4">
+          <>
             <div className="flex items-center mb-4">
-              <AlertTriangle
-                size={20}
-                className={theme === "hacker" ? "text-yellow-500 mr-2" : "text-yellow-400 mr-2"}
-              />
-              <h2 className={`text-lg font-bold ${theme === "hacker" ? "text-yellow-500" : "text-white"}`}>
+              <AlertTriangle size={18} className={theme === "hacker" ? "text-yellow-500 mr-2" : "text-gray-300 mr-2"} />
+              <h2 className={`text-base font-bold ${theme === "hacker" ? "text-yellow-500" : "text-white"}`}>
                 RUG ALERT SYSTEM
               </h2>
             </div>
@@ -558,28 +666,32 @@ export function RektRadar() {
                   key={index}
                   className={`border rounded-md p-4 bg-black/30 ${
                     alert.signal === "high"
-                      ? "border-red-500"
+                      ? theme === "hacker"
+                        ? "border-red-500"
+                        : "border-gray-500"
                       : alert.signal === "medium"
-                        ? "border-yellow-500"
-                        : "border-blue-500"
+                        ? "border-gray-600"
+                        : "border-gray-700"
                   }`}
                 >
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center">
-                        <h3 className={`text-lg font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+                        <h3 className={`text-xl font-bold ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
                           {alert.protocol}
                         </h3>
                         <span
-                          className={`ml-2 px-2 py-0.5 rounded text-xs ${
+                          className={`ml-2 px-2 py-0.5 rounded text-xs uppercase ${
                             alert.signal === "high"
-                              ? "bg-red-900/30 text-red-500"
+                              ? theme === "hacker"
+                                ? "bg-red-900/30 text-red-500"
+                                : "bg-gray-900 text-red-400"
                               : alert.signal === "medium"
-                                ? "bg-yellow-900/30 text-yellow-500"
-                                : "bg-blue-900/30 text-blue-500"
+                                ? "bg-gray-900 text-gray-300"
+                                : "bg-gray-900 text-gray-400"
                           }`}
                         >
-                          {alert.signal.toUpperCase()} RISK
+                          {alert.signal} risk
                         </span>
                       </div>
                     </div>
@@ -587,7 +699,7 @@ export function RektRadar() {
                     <div className="text-right">
                       <div className="text-xs text-gray-400">TIMEFRAME</div>
                       <div
-                        className={`${
+                        className={`text-xs ${
                           alert.signal === "high"
                             ? theme === "hacker"
                               ? "text-red-500"
@@ -595,10 +707,10 @@ export function RektRadar() {
                             : alert.signal === "medium"
                               ? theme === "hacker"
                                 ? "text-yellow-500"
-                                : "text-yellow-400"
+                                : "text-gray-300"
                               : theme === "hacker"
                                 ? "text-blue-500"
-                                : "text-blue-400"
+                                : "text-gray-400"
                         }`}
                       >
                         {alert.timeframe}
@@ -608,35 +720,35 @@ export function RektRadar() {
 
                   <div className="mt-3">
                     <div className="text-xs text-gray-400 mb-1">EVIDENCE:</div>
-                    <ul className="list-disc pl-5 space-y-1">
+                    <ul className="list-disc pl-4 space-y-0.5">
                       {alert.evidence.map((item, i) => (
-                        <li key={i} className="text-gray-300">
+                        <li key={i} className="text-xs text-gray-300">
                           {item}
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="mt-4 flex justify-between">
+                  <div className="mt-3 flex justify-between">
                     <button
-                      className={`flex items-center text-xs px-3 py-1 rounded ${
+                      className={`flex items-center text-xs px-2 py-0.5 rounded ${
                         theme === "hacker"
                           ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
-                          : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
+                          : "bg-gray-800 text-white hover:bg-gray-700"
                       }`}
                     >
-                      <Eye size={12} className="mr-1" />
+                      <Eye size={10} className="mr-1" />
                       Watch Wallet Activity
                     </button>
 
                     <button
-                      className={`flex items-center text-xs px-3 py-1 rounded ${
+                      className={`flex items-center text-xs px-2 py-0.5 rounded ${
                         theme === "hacker"
                           ? "bg-red-900/30 text-red-500 hover:bg-red-900/50"
-                          : "bg-red-900/30 text-red-400 hover:bg-red-900/50"
+                          : "bg-gray-800 text-white hover:bg-gray-700"
                       }`}
                     >
-                      <FileWarning size={12} className="mr-1" />
+                      <FileWarning size={10} className="mr-1" />
                       Submit Evidence
                     </button>
                   </div>
@@ -645,73 +757,73 @@ export function RektRadar() {
             </div>
 
             <div className="mt-6 border border-gray-800 rounded-md p-4 bg-black/30">
-              <h3 className={`font-bold mb-2 ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
+              <h3 className={`text-sm font-bold mb-2 ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
                 COMMON RUG PATTERNS
               </h3>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div>
                   <div className="flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
-                    <span className={`font-medium ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 mr-2"></div>
+                    <span className={`text-xs font-medium ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
                       Team Token Movements to CEXs
                     </span>
                   </div>
-                  <p className="text-gray-400 text-sm ml-4">
+                  <p className="text-xs text-gray-400 ml-3.5">
                     Team wallets moving large amounts of tokens to exchanges before announcements
                   </p>
                 </div>
 
                 <div>
                   <div className="flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
-                    <span className={`font-medium ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 mr-2"></div>
+                    <span className={`text-xs font-medium ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
                       Governance Takeovers
                     </span>
                   </div>
-                  <p className="text-gray-400 text-sm ml-4">
+                  <p className="text-xs text-gray-400 ml-3.5">
                     Sudden proposals to change multisig signers or treasury control with minimal notice
                   </p>
                 </div>
 
                 <div>
                   <div className="flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
-                    <span className={`font-medium ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 mr-2"></div>
+                    <span className={`text-xs font-medium ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
                       Social Media Disappearance
                     </span>
                   </div>
-                  <p className="text-gray-400 text-sm ml-4">
+                  <p className="text-xs text-gray-400 ml-3.5">
                     Team stops responding in Discord/Telegram and delays AMAs before major token events
                   </p>
                 </div>
 
                 <div>
                   <div className="flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
-                    <span className={`font-medium ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 mr-2"></div>
+                    <span className={`text-xs font-medium ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
                       Liquidity Removal Patterns
                     </span>
                   </div>
-                  <p className="text-gray-400 text-sm ml-4">
+                  <p className="text-xs text-gray-400 ml-3.5">
                     Gradual reduction in liquidity before major announcements or token unlocks
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 text-center">
+              <div className="mt-3 text-center">
                 <button
-                  className={`text-xs px-3 py-1 rounded ${
+                  className={`text-xs px-2 py-0.5 rounded ${
                     theme === "hacker"
                       ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
-                      : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
+                      : "bg-gray-800 text-white hover:bg-gray-700"
                   }`}
                 >
                   Submit Anonymous Tip
                 </button>
               </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>

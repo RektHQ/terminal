@@ -7,24 +7,29 @@ import { TerminalFooter } from "./components/terminal-footer"
 import { LaunchButton } from "./components/launch-button"
 import { MarketTicker } from "./components/market-ticker"
 import { SubscriptionBanner } from "./components/subscription-banner"
-import DashboardLayout from "./components/dashboard-layout"
 import { BloombergDashboard } from "./components/bloomberg-dashboard"
 import { useIsMobile } from "./hooks/use-mobile"
 import { RektAIAssistant } from "./components/rekt-ai-assistant"
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
-  // Set isFullscreen to true by default
   const [isFullscreen, setIsFullscreen] = useState(true)
   const [isTerminalActive, setIsTerminalActive] = useState(true)
-  // Change the default view to "terminal" instead of "bloomberg"
   const [activeView, setActiveView] = useState<"terminal" | "dashboard" | "bloomberg" | "ai">("bloomberg")
   const terminalRef = useRef<TerminalRef>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Reset scroll position when view changes
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0
+    }
+  }, [activeView])
 
   const handleExecuteCommand = (command: string) => {
     const lowerCommand = command.toLowerCase()
@@ -90,55 +95,31 @@ export default function Home() {
     )
   }
 
-  // Determine container classes based on fullscreen state and mobile
-  const containerClasses = isFullscreen
-    ? "fixed inset-0 z-50 flex flex-col w-full h-full"
-    : isMobile
-      ? "w-full h-screen flex flex-col"
-      : "w-full h-screen flex flex-col"
-
   return (
-    <main
-      className={`flex min-h-screen w-full flex-col items-center justify-center bg-black ${isFullscreen ? "p-0" : "p-0"}`}
-    >
-      <div
-        className={`${containerClasses} rounded-md border border-red-500/50 shadow-lg shadow-red-500/20 overflow-hidden`}
-      >
+    <main className="flex flex-col h-screen bg-black text-white overflow-hidden">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0">
+        <TerminalHeader
+          onExecuteCommand={handleExecuteCommand}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={toggleFullscreen}
+          onClose={closeTerminal}
+          onOpenAIConsole={openAIConsole}
+        />
+        <MarketTicker />
+        <SubscriptionBanner />
+      </div>
+
+      {/* Scrollable Content */}
+      <div ref={contentRef} className="flex-grow overflow-auto">
         {activeView === "terminal" ? (
-          <>
-            <TerminalHeader
-              onExecuteCommand={handleExecuteCommand}
-              isFullscreen={isFullscreen}
-              onToggleFullscreen={toggleFullscreen}
-              onClose={closeTerminal}
-              onOpenAIConsole={openAIConsole}
-            />
-            <MarketTicker />
-            <SubscriptionBanner />
-            <Terminal ref={terminalRef} onOpenAIConsole={openAIConsole} onExecuteCommand={handleExecuteCommand} />
-            <TerminalFooter />
-          </>
+          <Terminal ref={terminalRef} onOpenAIConsole={openAIConsole} onExecuteCommand={handleExecuteCommand} />
         ) : activeView === "dashboard" ? (
-          <DashboardLayout
-            onClose={() => setActiveView("terminal")}
-            isFullscreen={isFullscreen}
-            onToggleFullscreen={toggleFullscreen}
-          />
+          <div className="h-full">Dashboard Content</div>
         ) : activeView === "ai" ? (
-          <>
-            <TerminalHeader
-              onExecuteCommand={handleExecuteCommand}
-              isFullscreen={isFullscreen}
-              onToggleFullscreen={toggleFullscreen}
-              onClose={closeTerminal}
-            />
-            <MarketTicker />
-            <SubscriptionBanner />
-            <div className="flex-1">
-              <RektAIAssistant onBackToDashboard={() => setActiveView("terminal")} isFullscreen={true} />
-            </div>
-            <TerminalFooter />
-          </>
+          <div className="h-full">
+            <RektAIAssistant onBackToDashboard={() => setActiveView("terminal")} isFullscreen={true} />
+          </div>
         ) : (
           <BloombergDashboard
             onClose={() => setActiveView("terminal")}
@@ -146,6 +127,11 @@ export default function Home() {
             onToggleFullscreen={toggleFullscreen}
           />
         )}
+      </div>
+
+      {/* Fixed Footer */}
+      <div className="flex-shrink-0">
+        <TerminalFooter />
       </div>
     </main>
   )
