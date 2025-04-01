@@ -16,12 +16,13 @@ import { GovernanceWidget } from "./governance-widget"
 import { RektAIAssistant } from "./rekt-ai-assistant"
 import { ExploitStats } from "./exploit-stats"
 import { AICapabilitiesWidget } from "./ai-capabilities-widget"
+import { RektRadar } from "./rekt-radar"
 import { X, Menu } from "lucide-react"
 import { TerminalFooter } from "./terminal-footer"
 import { TerminalHeader } from "./terminal-header"
 import { MarketTicker } from "./market-ticker"
 import { SubscriptionBanner } from "./subscription-banner"
-import { useIsMobile } from "../hooks/use-mobile"
+import { useIsMobile } from "./hooks/use-mobile"
 
 interface BloombergDashboardProps {
   onClose?: () => void
@@ -37,6 +38,7 @@ export function BloombergDashboard({
   const { theme } = useTheme()
   const isMobile = useIsMobile()
   const [tabs, setTabs] = useState([
+    { id: "rektRadar", title: "REKT RADAR", closable: false },
     { id: "market", title: "MARKET DATA", closable: false },
     { id: "news", title: "LIVE NEWS", closable: false },
     { id: "security", title: "SECURITY ALERTS", closable: false },
@@ -45,7 +47,7 @@ export function BloombergDashboard({
     { id: "stats", title: "EXPLOIT STATS", closable: true },
     { id: "capabilities", title: "AI CAPABILITIES", closable: true },
   ])
-  const [activeTab, setActiveTab] = useState("market")
+  const [activeTab, setActiveTab] = useState("rektRadar")
   const [showTabMenu, setShowTabMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [aiFullscreen, setAiFullscreen] = useState(false)
@@ -79,6 +81,8 @@ export function BloombergDashboard({
 
   const getTabContent = (tabId: string) => {
     switch (tabId) {
+      case "rektRadar":
+        return <RektRadar />
       case "market":
         return <MarketDataVisualization />
       case "news":
@@ -218,8 +222,8 @@ export function BloombergDashboard({
       )}
 
       <div className="flex-1 flex flex-col">
-        {/* Main tab area - takes 50% of the height */}
-        <div className={`${isMobile ? "h-[50%]" : "h-[50%]"}`}>
+        {/* Main tab area - takes 70% of the height */}
+        <div className={`${isMobile ? "h-[70%]" : "h-[70%]"}`}>
           <TabSystem
             tabs={tabs.map((tab) => ({
               ...tab,
@@ -231,9 +235,9 @@ export function BloombergDashboard({
           />
         </div>
 
-        {/* Mini windows area - takes 50% of the height and fills to the bottom */}
+        {/* Mini windows area - takes 30% of the height */}
         <div
-          className={`${isMobile ? "h-[50%]" : "h-[50%]"} border-t border-gray-800 flex flex-col md:flex-row flex-grow`}
+          className={`${isMobile ? "h-[30%]" : "h-[30%]"} border-t border-gray-800 flex flex-col md:flex-row flex-grow`}
         >
           {isMobile ? (
             // Mobile view - show one mini window at a time with navigation

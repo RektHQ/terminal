@@ -18,7 +18,7 @@ export default function Home() {
   const [isFullscreen, setIsFullscreen] = useState(true)
   const [isTerminalActive, setIsTerminalActive] = useState(true)
   // Change the default view to "terminal" instead of "bloomberg"
-  const [activeView, setActiveView] = useState<"terminal" | "dashboard" | "bloomberg" | "ai">("terminal")
+  const [activeView, setActiveView] = useState<"terminal" | "dashboard" | "bloomberg" | "ai">("bloomberg")
   const terminalRef = useRef<TerminalRef>(null)
   const isMobile = useIsMobile()
 
@@ -92,14 +92,14 @@ export default function Home() {
 
   // Determine container classes based on fullscreen state and mobile
   const containerClasses = isFullscreen
-    ? "fixed inset-0 z-50 flex flex-col"
+    ? "fixed inset-0 z-50 flex flex-col w-full h-full"
     : isMobile
-      ? "w-full h-[80vh] flex flex-col"
-      : "w-full max-w-5xl h-[80vh] flex flex-col"
+      ? "w-full h-screen flex flex-col"
+      : "w-full h-screen flex flex-col"
 
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-center bg-black p-4 ${isFullscreen ? "p-0" : "p-8"}`}
+      className={`flex min-h-screen w-full flex-col items-center justify-center bg-black ${isFullscreen ? "p-0" : "p-0"}`}
     >
       <div
         className={`${containerClasses} rounded-md border border-red-500/50 shadow-lg shadow-red-500/20 overflow-hidden`}
@@ -115,7 +115,7 @@ export default function Home() {
             />
             <MarketTicker />
             <SubscriptionBanner />
-            <Terminal ref={terminalRef} onOpenAIConsole={openAIConsole} />
+            <Terminal ref={terminalRef} onOpenAIConsole={openAIConsole} onExecuteCommand={handleExecuteCommand} />
             <TerminalFooter />
           </>
         ) : activeView === "dashboard" ? (

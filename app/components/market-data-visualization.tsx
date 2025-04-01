@@ -16,6 +16,15 @@ interface MarketData {
   exploits?: number
 }
 
+interface CandleData {
+  time: string
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
 const mockMarketData: MarketData[] = [
   {
     symbol: "BTC",
@@ -187,6 +196,7 @@ export function MarketDataVisualization() {
   const [sortField, setSortField] = useState<keyof MarketData>("marketCap")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null)
+  const [timeframe, setTimeframe] = useState<"1D" | "1W" | "1M" | "3M" | "1Y">("1M")
   const chartRef = useRef<HTMLCanvasElement>(null)
 
   const sortedData = [...mockMarketData].sort((a, b) => {
@@ -225,6 +235,47 @@ export function MarketDataVisualization() {
     }
   }
 
+  // Generate mock candle data for the selected asset
+  const generateCandleData = (asset: MarketData, days: number): CandleData[] => {
+    const data: CandleData[] = []
+    const basePrice = asset.price
+    const volatility = basePrice * 0.02 // 2% volatility
+    const trend = asset.changePercent / 100 // Use the asset's change percent as the trend
+
+    const now = new Date()
+
+    for (let i = days; i >= 0; i--) {
+      const date = new Date(now)
+      date.setDate(date.getDate() - i)
+
+      // Generate random but realistic OHLC data
+      const dayTrend = trend * (Math.random() * 0.8 + 0.6) // Randomize the trend a bit
+      const dayVolatility = volatility * (Math.random() * 0.8 + 0.6)
+
+      const open = i === days ? basePrice : data[data.length - 1].close
+      const change = open * dayTrend
+      const randomFactor = (Math.random() - 0.5) * dayVolatility
+
+      const close = open + change + randomFactor
+      const high = Math.max(open, close) + Math.random() * dayVolatility
+      const low = Math.min(open, close) - Math.random() * dayVolatility
+
+      // Generate volume that correlates somewhat with price movement
+      const volume = asset.volume * (0.7 + Math.random() * 0.6) * (1 + Math.abs(dayTrend) * 5)
+
+      data.push({
+        time: date.toISOString().split("T")[0],
+        open,
+        high,
+        low,
+        close,
+        volume,
+      })
+    }
+
+    return data
+  }
+
   // Draw price chart for selected asset
   useEffect(() => {
     if (!chartRef.current || !selectedAsset) return
@@ -236,79 +287,182 @@ export function MarketDataVisualization() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // Generate mock price data for the selected asset
+    // Get selected asset data
     const selectedAssetData = mockMarketData.find((asset) => asset.symbol === selectedAsset)
     if (!selectedAssetData) return
 
-    const basePrice = selectedAssetData.price
-    const priceHistory = Array(30)
-      .fill(0)
-      .map((_, i) => {
-        // Generate a somewhat realistic price curve with some volatility
-        const dayOffset = i - 29 // -29 to 0
-        const trendFactor = selectedAssetData.changePercent > 0 ? 1 : -1
-        const volatility = basePrice * 0.02 // 2% volatility
-        const trend = basePrice * (selectedAssetData.changePercent / 100) * (dayOffset / 10)
-        const random = (Math.random() - 0.5) * volatility
-        return basePrice + trend + random
-      })
+    // Generate candle data based on timeframe
+    let days = 30 // Default to 1M
+    switch (timeframe) {
+      case "1D":
+        days = 1
+        break
+      case "1W":
+        days = 7
+        break
+      case "1M":
+        days = 30
+        break
+      case "3M":
+        days = 90
+        break
+      case "1Y":
+        days = 365
+        break
+    }
+
+    const candleData = generateCandleData(selectedAssetData, days)
+
+    // Chart dimensions
+    const chartMargin = { top: 30, right: 60, bottom: 80, left: 60 }
+    const chartWidth = canvas.width - chartMargin.left - chartMargin.right
+    const chartHeight = canvas.height - chartMargin.top - chartMargin.bottom - 60 // Reserve space for volume
+    const volumeHeight = 50 // Height for volume bars
 
     // Find min and max for scaling
-    const minPrice = Math.min(...priceHistory) * 0.99
-    const maxPrice = Math.max(...priceHistory) * 1.01
+    const minPrice = Math.min(...candleData.map((d) => d.low)) * 0.995
+    const maxPrice = Math.max(...candleData.map((d) => d.high)) * 1.005
     const priceRange = maxPrice - minPrice
+
+    const maxVolume = Math.max(...candleData.map((d) => d.volume))
+
+    // Background
+    ctx.fillStyle = theme === "hacker" ? "#000000" : "#121212"
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     // Draw grid
     ctx.strokeStyle = theme === "hacker" ? "rgba(0, 255, 0, 0.1)" : "rgba(255, 255, 255, 0.1)"
     ctx.lineWidth = 0.5
 
-    // Horizontal grid lines
-    for (let i = 0; i <= 4; i++) {
-      const y = canvas.height - (i / 4) * canvas.height
+    // Horizontal price grid lines
+    for (let i = 0; i <= 5; i++) {
+      const y = chartMargin.top + (i / 5) * chartHeight
       ctx.beginPath()
-      ctx.moveTo(0, y)
-      ctx.lineTo(canvas.width, y)
+      ctx.moveTo(chartMargin.left, y)
+      ctx.lineTo(chartMargin.left + chartWidth, y)
       ctx.stroke()
 
       // Price labels
-      const price = minPrice + (i / 4) * priceRange
+      const price = maxPrice - (i / 5) * priceRange
       ctx.fillStyle = theme === "hacker" ? "#00ff00" : "#ffffff"
       ctx.font = "10px monospace"
-      ctx.textAlign = "left"
-      ctx.fillText(`$${price.toFixed(2)}`, 5, y - 5)
+      ctx.textAlign = "right"
+      ctx.fillText(`$${price.toFixed(2)}`, chartMargin.left - 5, y + 3)
     }
 
-    // Draw price line
-    ctx.strokeStyle =
-      selectedAssetData.changePercent >= 0
-        ? theme === "hacker"
-          ? "#00ff00"
-          : "#4ade80"
-        : theme === "hacker"
-          ? "#ff0000"
-          : "#f87171"
-    ctx.lineWidth = 2
-    ctx.beginPath()
+    // Vertical time grid lines
+    const timeLabels = candleData.filter((_, i) => i % Math.max(1, Math.floor(candleData.length / 6)) === 0)
+    timeLabels.forEach((data, i) => {
+      const x = chartMargin.left + (i / (timeLabels.length - 1)) * chartWidth
 
-    priceHistory.forEach((price, i) => {
-      const x = (i / (priceHistory.length - 1)) * canvas.width
-      const y = canvas.height - ((price - minPrice) / priceRange) * canvas.height
+      ctx.beginPath()
+      ctx.moveTo(x, chartMargin.top)
+      ctx.lineTo(x, chartMargin.top + chartHeight + volumeHeight + 10)
+      ctx.stroke()
 
-      if (i === 0) {
-        ctx.moveTo(x, y)
-      } else {
-        ctx.lineTo(x, y)
-      }
+      // Time labels
+      ctx.fillStyle = theme === "hacker" ? "#00ff00" : "#ffffff"
+      ctx.font = "10px monospace"
+      ctx.textAlign = "center"
+      ctx.fillText(data.time.slice(5), x, chartMargin.top + chartHeight + volumeHeight + 25)
     })
 
+    // Draw candles
+    const candleWidth = Math.min(15, (chartWidth / candleData.length) * 0.8)
+    const candleSpacing = chartWidth / candleData.length
+
+    candleData.forEach((candle, i) => {
+      const x = chartMargin.left + i * candleSpacing
+
+      // Calculate y positions
+      const openY = chartMargin.top + chartHeight - ((candle.open - minPrice) / priceRange) * chartHeight
+      const closeY = chartMargin.top + chartHeight - ((candle.close - minPrice) / priceRange) * chartHeight
+      const highY = chartMargin.top + chartHeight - ((candle.high - minPrice) / priceRange) * chartHeight
+      const lowY = chartMargin.top + chartHeight - ((candle.low - minPrice) / priceRange) * chartHeight
+
+      // Draw candle wick
+      ctx.beginPath()
+      ctx.moveTo(x + candleWidth / 2, highY)
+      ctx.lineTo(x + candleWidth / 2, lowY)
+      ctx.strokeStyle =
+        candle.close >= candle.open
+          ? theme === "hacker"
+            ? "#00ff00"
+            : "#4ade80"
+          : theme === "hacker"
+            ? "#ff0000"
+            : "#f87171"
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      // Draw candle body
+      ctx.fillStyle =
+        candle.close >= candle.open
+          ? theme === "hacker"
+            ? "#00ff00"
+            : "#4ade80"
+          : theme === "hacker"
+            ? "#ff0000"
+            : "#f87171"
+      ctx.fillRect(x, Math.min(openY, closeY), candleWidth, Math.max(1, Math.abs(closeY - openY)))
+
+      // Draw volume bars
+      const volumeY = chartMargin.top + chartHeight + 10
+      const volumeBarHeight = (candle.volume / maxVolume) * volumeHeight
+
+      ctx.fillStyle =
+        candle.close >= candle.open
+          ? theme === "hacker"
+            ? "rgba(0, 255, 0, 0.5)"
+            : "rgba(74, 222, 128, 0.5)"
+          : theme === "hacker"
+            ? "rgba(255, 0, 0, 0.5)"
+            : "rgba(248, 113, 113, 0.5)"
+      ctx.fillRect(x, volumeY + volumeHeight - volumeBarHeight, candleWidth, volumeBarHeight)
+    })
+
+    // Draw volume label
+    ctx.fillStyle = theme === "hacker" ? "#00ff00" : "#ffffff"
+    ctx.font = "10px monospace"
+    ctx.textAlign = "left"
+    ctx.fillText("Volume", chartMargin.left, chartMargin.top + chartHeight + 20)
+
+    // Draw current price line
+    const currentPrice = selectedAssetData.price
+    const currentPriceY = chartMargin.top + chartHeight - ((currentPrice - minPrice) / priceRange) * chartHeight
+
+    ctx.beginPath()
+    ctx.moveTo(chartMargin.left, currentPriceY)
+    ctx.lineTo(chartMargin.left + chartWidth, currentPriceY)
+    ctx.strokeStyle = theme === "hacker" ? "#ffff00" : "#facc15"
+    ctx.lineWidth = 1
+    ctx.setLineDash([5, 3])
     ctx.stroke()
+    ctx.setLineDash([])
+
+    // Draw current price label
+    ctx.fillStyle = theme === "hacker" ? "#ffff00" : "#facc15"
+    ctx.font = "bold 10px monospace"
+    ctx.textAlign = "right"
+    ctx.fillText(`$${currentPrice.toFixed(2)}`, chartMargin.left + chartWidth + 55, currentPriceY + 4)
 
     // Draw title
     ctx.fillStyle = theme === "hacker" ? "#ff3333" : "#ffffff"
     ctx.font = "bold 12px monospace"
     ctx.textAlign = "center"
-    ctx.fillText(`${selectedAsset} - 30 Day Price History`, canvas.width / 2, 15)
-  }, [selectedAsset, theme])
+    ctx.fillText(`${selectedAsset} - ${timeframe} Chart`, canvas.width / 2, 15)
+
+    // Draw last candle info
+    const lastCandle = candleData[candleData.length - 1]
+    ctx.fillStyle = theme === "hacker" ? "#00ff00" : "#ffffff"
+    ctx.font = "10px monospace"
+    ctx.textAlign = "left"
+    ctx.fillText(
+      `O: $${lastCandle.open.toFixed(2)}  H: $${lastCandle.high.toFixed(2)}  L: $${lastCandle.low.toFixed(2)}  C: $${lastCandle.close.toFixed(2)}`,
+      chartMargin.left,
+      15,
+    )
+  }, [selectedAsset, theme, timeframe])
 
   return (
     <div className="flex flex-col h-full">
@@ -395,9 +549,29 @@ export function MarketDataVisualization() {
           {selectedAsset ? (
             <>
               <div className="mb-4">
-                <h3 className={`text-lg font-bold ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
-                  {mockMarketData.find((a) => a.symbol === selectedAsset)?.name} ({selectedAsset})
-                </h3>
+                <div className="flex justify-between items-center">
+                  <h3 className={`text-lg font-bold ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
+                    {mockMarketData.find((a) => a.symbol === selectedAsset)?.name} ({selectedAsset})
+                  </h3>
+
+                  <div className="flex items-center space-x-1 bg-gray-900 rounded-md p-1">
+                    {["1D", "1W", "1M", "3M", "1Y"].map((tf) => (
+                      <button
+                        key={tf}
+                        className={`px-2 py-0.5 text-xs rounded ${
+                          timeframe === tf
+                            ? theme === "hacker"
+                              ? "bg-green-900 text-green-500"
+                              : "bg-blue-900 text-white"
+                            : "text-gray-400 hover:text-gray-300"
+                        }`}
+                        onClick={() => setTimeframe(tf as any)}
+                      >
+                        {tf}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="flex items-center mt-1">
                   <span className="text-gray-400 text-sm mr-2">Current Price:</span>
                   <span className={`font-mono text-lg ${theme === "hacker" ? "text-green-500" : "text-white"}`}>
@@ -405,6 +579,12 @@ export function MarketDataVisualization() {
                     {mockMarketData
                       .find((a) => a.symbol === selectedAsset)
                       ?.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                  <span
+                    className={`ml-2 text-sm ${getColorClass(mockMarketData.find((a) => a.symbol === selectedAsset)?.changePercent || 0)}`}
+                  >
+                    {mockMarketData.find((a) => a.symbol === selectedAsset)?.changePercent! > 0 ? "+" : ""}
+                    {mockMarketData.find((a) => a.symbol === selectedAsset)?.changePercent.toFixed(2)}%
                   </span>
                 </div>
               </div>
@@ -414,7 +594,7 @@ export function MarketDataVisualization() {
               <div className="mt-4 text-sm text-gray-400">
                 <div className="flex items-center">
                   <Info size={14} className="mr-1" />
-                  <span>Click on any asset in the table to view its chart</span>
+                  <span>TradingView-style chart with OHLC and volume data</span>
                 </div>
               </div>
             </>
