@@ -325,7 +325,7 @@ export function DashboardWidget({
           </>
         )}
       </div>
-      <div className={`flex-1 overflow-auto ${expanded ? "" : "max-h-40"} ${minimized ? "hidden" : ""}`}>
+      <div className={`flex-1 overflow-auto ${expanded ? "h-full" : "max-h-40"} ${minimized ? "hidden" : ""}`}>
         {children}
       </div>
 

@@ -106,8 +106,8 @@ export function WalletWatchlistWidget({
       onDragEnd={onDragEnd}
       onResize={onResize}
     >
-      <div className="p-2">
-        <table className="w-full text-sm">
+      <div className="p-2 h-full flex flex-col">
+        <table className="w-full text-sm h-full">
           <thead>
             <tr className="text-gray-500 text-xs border-b border-gray-800">
               <th className="text-left pb-2">LABEL</th>
@@ -118,9 +118,9 @@ export function WalletWatchlistWidget({
               <th className="text-right pb-2"></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-800">
             {mockWallets.map((wallet) => (
-              <tr key={wallet.id} className="border-b border-gray-800">
+              <tr key={wallet.id}>
                 <td className="py-2">
                   <div className="flex flex-col">
                     <span className={theme === "hacker" ? "text-green-500" : "text-white"}>{wallet.label}</span>
