@@ -21,7 +21,7 @@ import { TerminalFooter } from "./terminal-footer"
 import { TerminalHeader } from "./terminal-header"
 import { MarketTicker } from "./market-ticker"
 import { SubscriptionBanner } from "./subscription-banner"
-import { useIsMobile } from "./hooks/use-mobile"
+import { useIsMobile } from "../hooks/use-mobile"
 
 interface BloombergDashboardProps {
   onClose?: () => void
@@ -218,8 +218,8 @@ export function BloombergDashboard({
       )}
 
       <div className="flex-1 flex flex-col">
-        {/* Main tab area - takes 30% of the height to show more content in mini windows */}
-        <div className={`${isMobile ? "h-[30%]" : "h-[30%]"}`}>
+        {/* Main tab area - takes 50% of the height */}
+        <div className={`${isMobile ? "h-[50%]" : "h-[50%]"}`}>
           <TabSystem
             tabs={tabs.map((tab) => ({
               ...tab,
@@ -231,9 +231,9 @@ export function BloombergDashboard({
           />
         </div>
 
-        {/* Mini windows area - takes 70% of the height to show more content */}
+        {/* Mini windows area - takes 50% of the height and fills to the bottom */}
         <div
-          className={`${isMobile ? "h-[70%]" : "h-[70%]"} border-t border-gray-800 flex flex-col md:flex-row flex-grow`}
+          className={`${isMobile ? "h-[50%]" : "h-[50%]"} border-t border-gray-800 flex flex-col md:flex-row flex-grow`}
         >
           {isMobile ? (
             // Mobile view - show one mini window at a time with navigation

@@ -115,7 +115,7 @@ export default function Home() {
             />
             <MarketTicker />
             <SubscriptionBanner />
-            <Terminal ref={terminalRef} onOpenAIConsole={openAIConsole} onExecuteCommand={handleExecuteCommand} />
+            <Terminal ref={terminalRef} onOpenAIConsole={openAIConsole} />
             <TerminalFooter />
           </>
         ) : activeView === "dashboard" ? (

@@ -19,10 +19,9 @@ export interface TerminalRef {
 
 interface TerminalProps {
   onOpenAIConsole?: () => void
-  onExecuteCommand?: (command: string) => void
 }
 
-export const Terminal = forwardRef<TerminalRef, TerminalProps>(({ onOpenAIConsole, onExecuteCommand }, ref) => {
+export const Terminal = forwardRef<TerminalRef, TerminalProps>(({ onOpenAIConsole }, ref) => {
   const [history, setHistory] = useState<Array<{ type: "input" | "output"; content: any }>>([])
   const { executeCommand } = useTerminalCommands()
   const terminalRef = useRef<HTMLDivElement>(null)
@@ -95,10 +94,7 @@ Type 'help' to see available commands.`,
       // Add a message to the terminal before switching views
       await addOutput(`Launching ${command.toLowerCase()} interface...`)
       scrollToBottom()
-      // Call the parent's handler to switch views
-      if (onExecuteCommand) {
-        onExecuteCommand(command)
-      }
+      // Let the parent component handle the view switching
       return
     }
 
@@ -106,10 +102,7 @@ Type 'help' to see available commands.`,
       // Add a message to the terminal before switching views
       await addOutput(`Launching AI Console...`)
       scrollToBottom()
-      // Call the parent's handler to switch views
-      if (onExecuteCommand) {
-        onExecuteCommand(command)
-      }
+      // Let the parent component handle the view switching
       return
     }
 

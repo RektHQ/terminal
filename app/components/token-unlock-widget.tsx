@@ -112,45 +112,43 @@ export function TokenUnlockWidget({
       onDragEnd={onDragEnd}
       onResize={onResize}
     >
-      <div className="p-2 h-full flex flex-col">
-        <div className="flex-1 flex flex-col justify-start space-y-2">
-          {mockUnlocks.map((unlock) => (
-            <div key={unlock.id} className="border border-gray-800 p-2 rounded">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center">
-                  <span className={`${theme === "hacker" ? "text-green-500" : "text-white"} font-bold`}>
-                    {unlock.project}
-                  </span>
-                  <span className={`ml-2 text-xs px-2 py-0.5 rounded uppercase ${getCategoryColor(unlock.category)}`}>
-                    {unlock.category}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <Calendar size={14} className="text-gray-500 mr-1" />
-                  <span className="text-gray-400 text-xs">{unlock.date}</span>
-                </div>
+      <div className="p-2 space-y-2">
+        {mockUnlocks.map((unlock) => (
+          <div key={unlock.id} className="border border-gray-800 p-2 rounded">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center">
+                <span className={`${theme === "hacker" ? "text-green-500" : "text-white"} font-bold`}>
+                  {unlock.project}
+                </span>
+                <span className={`ml-2 text-xs px-2 py-0.5 rounded uppercase ${getCategoryColor(unlock.category)}`}>
+                  {unlock.category}
+                </span>
               </div>
-
-              <div className="mt-2 flex justify-between items-center">
-                <div>
-                  <div className="text-sm text-gray-300">{unlock.amount.toLocaleString()} tokens</div>
-                  <div className={`text-xs ${theme === "hacker" ? "terminal-text-yellow" : "text-gray-300"}`}>
-                    ~${unlock.amountUsd.toLocaleString()}
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  {unlock.daysRemaining <= 7 ? (
-                    <Unlock size={14} className={getUrgencyColor(unlock.daysRemaining)} />
-                  ) : (
-                    <Lock size={14} className="text-gray-500" />
-                  )}
-                  <span className={`ml-1 ${getUrgencyColor(unlock.daysRemaining)}`}>{unlock.daysRemaining} days</span>
-                </div>
+              <div className="flex items-center">
+                <Calendar size={14} className="text-gray-500 mr-1" />
+                <span className="text-gray-400 text-xs">{unlock.date}</span>
               </div>
             </div>
-          ))}
-        </div>
+
+            <div className="mt-2 flex justify-between items-center">
+              <div>
+                <div className="text-sm text-gray-300">{unlock.amount.toLocaleString()} tokens</div>
+                <div className={`text-xs ${theme === "hacker" ? "terminal-text-yellow" : "text-gray-300"}`}>
+                  ~${unlock.amountUsd.toLocaleString()}
+                </div>
+              </div>
+
+              <div className="flex items-center">
+                {unlock.daysRemaining <= 7 ? (
+                  <Unlock size={14} className={getUrgencyColor(unlock.daysRemaining)} />
+                ) : (
+                  <Lock size={14} className="text-gray-500" />
+                )}
+                <span className={`ml-1 ${getUrgencyColor(unlock.daysRemaining)}`}>{unlock.daysRemaining} days</span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </DashboardWidget>
   )
