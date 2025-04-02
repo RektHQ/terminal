@@ -2,6 +2,7 @@
 
 import { useTheme } from "../contexts/theme-context"
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react"
+import { DashboardWidget } from "./dashboard-widget"
 
 interface GovernanceProposal {
   id: string
@@ -130,55 +131,62 @@ export function GovernanceWidget({
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 overflow-auto">
-        <div className="p-2 space-y-2">
-          {mockProposals.map((proposal) => (
-            <div key={proposal.id} className="border border-gray-800 p-2 rounded">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center">
-                  <span className={`${theme === "hacker" ? "text-green-500" : "text-white"} font-bold`}>
-                    {proposal.protocol}
-                  </span>
-                  <span className={`ml-2 text-xs px-2 py-0.5 rounded uppercase ${getStatusColor(proposal.status)}`}>
-                    {proposal.status}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  {getRiskIcon(proposal.riskLevel)}
-                  <span className="text-gray-400 text-xs ml-1">Risk: {proposal.riskLevel}</span>
-                </div>
+    <DashboardWidget
+      title="GOVERNANCE TRACKER"
+      onClose={onClose}
+      onMaximize={onMaximize}
+      isMaximized={isMaximized}
+      id={id}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      onResize={onResize}
+    >
+      <div className="p-2 space-y-2">
+        {mockProposals.map((proposal) => (
+          <div key={proposal.id} className="border border-gray-800 p-2 rounded">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center">
+                <span className={`${theme === "hacker" ? "text-green-500" : "text-white"} font-bold`}>
+                  {proposal.protocol}
+                </span>
+                <span className={`ml-2 text-xs px-2 py-0.5 rounded uppercase ${getStatusColor(proposal.status)}`}>
+                  {proposal.status}
+                </span>
               </div>
-
-              <div className="mt-1">
-                <div className="text-sm text-gray-300 font-medium">{proposal.title}</div>
-                <div className="text-xs text-gray-500 line-clamp-1">{proposal.description}</div>
-              </div>
-
-              <div className="mt-2">
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>For: {(proposal.votesFor / 1000000).toFixed(2)}M</span>
-                  <span>Against: {(proposal.votesAgainst / 1000000).toFixed(2)}M</span>
-                </div>
-                <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                  {proposal.votesFor + proposal.votesAgainst > 0 && (
-                    <div
-                      className={theme === "hacker" ? "bg-green-500" : "bg-blue-500"}
-                      style={{ width: `${(proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100}%` }}
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-2 flex justify-end items-center">
-                <Clock size={14} className="text-gray-500 mr-1" />
-                <span className="text-gray-400 text-xs">{formatTimeRemaining(proposal.endTime)}</span>
+              <div className="flex items-center">
+                {getRiskIcon(proposal.riskLevel)}
+                <span className="text-gray-400 text-xs ml-1">Risk: {proposal.riskLevel}</span>
               </div>
             </div>
-          ))}
-        </div>
+
+            <div className="mt-1">
+              <div className="text-sm text-gray-300 font-medium">{proposal.title}</div>
+              <div className="text-xs text-gray-500 line-clamp-1">{proposal.description}</div>
+            </div>
+
+            <div className="mt-2">
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>For: {(proposal.votesFor / 1000000).toFixed(2)}M</span>
+                <span>Against: {(proposal.votesAgainst / 1000000).toFixed(2)}M</span>
+              </div>
+              <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                {proposal.votesFor + proposal.votesAgainst > 0 && (
+                  <div
+                    className={theme === "hacker" ? "bg-green-500" : "bg-blue-500"}
+                    style={{ width: `${(proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100}%` }}
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="mt-2 flex justify-end items-center">
+              <Clock size={14} className="text-gray-500 mr-1" />
+              <span className="text-gray-400 text-xs">{formatTimeRemaining(proposal.endTime)}</span>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
+    </DashboardWidget>
   )
 }
 

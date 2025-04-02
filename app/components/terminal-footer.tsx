@@ -34,8 +34,8 @@ export function TerminalFooter() {
         {!isMobile && <div>INDEPENDENT JOURNALISM • NO MERCY • NO MALICE</div>}
         <div className="flex items-center space-x-3">
           <div className="flex items-center">
-            <Database size={12} className={theme === "hacker" ? "text-blue-500 mr-1" : "text-white mr-1"} />
-            <span className={theme === "hacker" ? "text-blue-500" : "text-white"}>
+            <Database size={12} className={theme === "hacker" ? "text-blue-500 mr-1" : "text-blue-400 mr-1"} />
+            <span className={theme === "hacker" ? "text-blue-500" : "text-blue-400"}>
               ETH #{blockNumber.toLocaleString()}
             </span>
           </div>
@@ -43,7 +43,7 @@ export function TerminalFooter() {
             {isSecure ? (
               <>
                 <Lock size={12} className={secureClass + " mr-1"} />
-                <span className={theme === "hacker" ? "text-green-500" : "text-white"}>SECURE</span>
+                <span className={secureClass}>SECURE</span>
               </>
             ) : (
               <>
@@ -53,11 +53,11 @@ export function TerminalFooter() {
             )}
           </div>
           <div className="flex items-center">
-            <span className={theme === "hacker" ? "text-green-500" : "text-white"}>ZK</span>
+            <span className={theme === "hacker" ? "text-green-500" : "text-green-400"}>ZK</span>
             <span className="text-gray-500 mx-1">•</span>
-            <span className={theme === "hacker" ? "text-blue-500" : "text-white"}>FHE</span>
+            <span className={theme === "hacker" ? "text-blue-500" : "text-blue-400"}>FHE</span>
             <span className="text-gray-500 mx-1">•</span>
-            <span className={theme === "hacker" ? "text-purple-500" : "text-white"}>MPC</span>
+            <span className={theme === "hacker" ? "text-purple-500" : "text-purple-400"}>MPC</span>
           </div>
         </div>
       </div>

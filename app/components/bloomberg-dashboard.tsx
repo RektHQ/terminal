@@ -4,17 +4,23 @@ import React from "react"
 
 import { useState } from "react"
 import { useTheme } from "../contexts/theme-context"
+import { TabSystem } from "./tab-system"
 import { MarketDataVisualization } from "./market-data-visualization"
 import { LiveNewsFeed } from "./live-news-feed"
 import { SecurityAlerts } from "./security-alerts"
 import { ProtocolHealthMonitor } from "./protocol-health-monitor"
+import { RiskAlertWidget } from "./risk-alert-widget"
 import { WalletWatchlistWidget } from "./wallet-watchlist-widget"
 import { TokenUnlockWidget } from "./token-unlock-widget"
 import { GovernanceWidget } from "./governance-widget"
 import { RektAIAssistant } from "./rekt-ai-assistant"
 import { ExploitStats } from "./exploit-stats"
-import { RektRadar } from "./rekt-radar"
+import { AICapabilitiesWidget } from "./ai-capabilities-widget"
 import { X, Menu } from "lucide-react"
+import { TerminalFooter } from "./terminal-footer"
+import { TerminalHeader } from "./terminal-header"
+import { MarketTicker } from "./market-ticker"
+import { SubscriptionBanner } from "./subscription-banner"
 import { useIsMobile } from "../hooks/use-mobile"
 
 interface BloombergDashboardProps {
@@ -31,14 +37,16 @@ export function BloombergDashboard({
   const { theme } = useTheme()
   const isMobile = useIsMobile()
   const [tabs, setTabs] = useState([
-    { id: "rektRadar", title: "REKT RADAR", closable: false, content: <RektRadar /> },
-    { id: "market", title: "MARKET DATA", closable: false, content: <MarketDataVisualization /> },
-    { id: "news", title: "LIVE NEWS", closable: false, content: <LiveNewsFeed /> },
-    { id: "security", title: "SECURITY ALERTS", closable: false, content: <SecurityAlerts /> },
-    { id: "health", title: "PROTOCOL HEALTH", closable: false, content: <ProtocolHealthMonitor /> },
-    { id: "stats", title: "EXPLOIT STATS", closable: true, content: <ExploitStats /> },
+    { id: "market", title: "MARKET DATA", closable: false },
+    { id: "news", title: "LIVE NEWS", closable: false },
+    { id: "security", title: "SECURITY ALERTS", closable: false },
+    { id: "health", title: "PROTOCOL HEALTH", closable: false },
+    { id: "risk", title: "RISK DASHBOARD", closable: true },
+    { id: "stats", title: "EXPLOIT STATS", closable: true },
+    { id: "capabilities", title: "AI CAPABILITIES", closable: true },
   ])
-  const [activeTab, setActiveTab] = useState("rektRadar")
+  const [activeTab, setActiveTab] = useState("market")
+  const [showTabMenu, setShowTabMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [aiFullscreen, setAiFullscreen] = useState(false)
 
@@ -59,8 +67,55 @@ export function BloombergDashboard({
     }
   }
 
-  const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId)
+  const addTab = (id: string, title: string) => {
+    if (!tabs.some((tab) => tab.id === id)) {
+      setTabs([...tabs, { id, title, closable: true }])
+      setActiveTab(id)
+    } else {
+      setActiveTab(id)
+    }
+    setShowTabMenu(false)
+  }
+
+  const getTabContent = (tabId: string) => {
+    switch (tabId) {
+      case "market":
+        return <MarketDataVisualization />
+      case "news":
+        return <LiveNewsFeed />
+      case "security":
+        return <SecurityAlerts />
+      case "health":
+        return <ProtocolHealthMonitor />
+      case "risk":
+        return (
+          <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2 h-full">
+            <RiskAlertWidget />
+            <WalletWatchlistWidget />
+          </div>
+        )
+      case "governance":
+        return (
+          <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2 h-full">
+            <GovernanceWidget />
+            <TokenUnlockWidget />
+          </div>
+        )
+      case "ai":
+        return <RektAIAssistant />
+      case "stats":
+        return <ExploitStats />
+      case "capabilities":
+        return <AICapabilitiesWidget />
+      default:
+        return <div>Tab content not found</div>
+    }
+  }
+
+  const handleExecuteCommand = (command: string) => {
+    if (command === "terminal" && onClose) {
+      onClose()
+    }
   }
 
   // Handle next/previous mini window for mobile
@@ -80,18 +135,37 @@ export function BloombergDashboard({
   // If AI is in fullscreen mode, show only the AI assistant
   if (aiFullscreen) {
     return (
-      <div className="h-full">
-        <RektAIAssistant
-          onMaximize={toggleAiFullscreen}
-          onBackToDashboard={() => setAiFullscreen(false)}
-          isFullscreen={true}
+      <div className="flex flex-col h-full w-full">
+        <TerminalHeader
+          onExecuteCommand={handleExecuteCommand}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={onToggleFullscreen}
+          onClose={onClose || (() => {})}
         />
+        <div className="flex-1">
+          <RektAIAssistant
+            onMaximize={toggleAiFullscreen}
+            onBackToDashboard={() => setAiFullscreen(false)}
+            isFullscreen={true}
+          />
+        </div>
+        <TerminalFooter />
       </div>
     )
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col h-full w-full">
+      {/* Header components */}
+      <TerminalHeader
+        onExecuteCommand={handleExecuteCommand}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={onToggleFullscreen}
+        onClose={onClose || (() => {})}
+      />
+      <MarketTicker />
+      <SubscriptionBanner />
+
       {/* Mobile menu button */}
       {isMobile && (
         <div className="p-2 border-b border-gray-800 flex justify-between items-center">
@@ -110,7 +184,7 @@ export function BloombergDashboard({
 
       {/* Mobile menu */}
       {isMobile && showMobileMenu && (
-        <div className="bg-black border-b border-gray-800 p-2 z-50">
+        <div className="bg-black border-b border-gray-800 p-2">
           <div className="flex flex-col space-y-2">
             {tabs.map((tab) => (
               <button
@@ -119,7 +193,7 @@ export function BloombergDashboard({
                   activeTab === tab.id
                     ? theme === "hacker"
                       ? "bg-green-900/30 text-green-500"
-                      : "bg-gray-800 text-white"
+                      : "bg-blue-900/30 text-white"
                     : "text-gray-400"
                 }`}
                 onClick={() => {
@@ -144,30 +218,23 @@ export function BloombergDashboard({
       )}
 
       <div className="flex-1 flex flex-col">
-        {/* Main tab area - takes 70% of the height */}
-        <div className="h-[70%] overflow-hidden">
-          <div className="flex border-b border-gray-800">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`px-4 py-2 text-sm font-medium ${
-                  activeTab === tab.id
-                    ? theme === "hacker"
-                      ? "bg-green-900/20 text-green-500 border-b-2 border-green-500"
-                      : "bg-gray-900 text-white border-b-2 border-white"
-                    : "text-gray-400 hover:text-gray-300"
-                }`}
-              >
-                {tab.title}
-              </button>
-            ))}
-          </div>
-          <div className="h-[calc(100%-40px)] overflow-auto">{tabs.find((tab) => tab.id === activeTab)?.content}</div>
+        {/* Main tab area - takes 50% of the height */}
+        <div className={`${isMobile ? "h-[50%]" : "h-[50%]"}`}>
+          <TabSystem
+            tabs={tabs.map((tab) => ({
+              ...tab,
+              content: getTabContent(tab.id),
+            }))}
+            defaultActiveTab={activeTab}
+            onTabClose={handleTabClose}
+            onTabChange={setActiveTab}
+          />
         </div>
 
-        {/* Mini windows area - takes 30% of the height */}
-        <div className="h-[30%] border-t border-gray-800 flex flex-col md:flex-row">
+        {/* Mini windows area - takes 50% of the height and fills to the bottom */}
+        <div
+          className={`${isMobile ? "h-[50%]" : "h-[50%]"} border-t border-gray-800 flex flex-col md:flex-row flex-grow`}
+        >
           {isMobile ? (
             // Mobile view - show one mini window at a time with navigation
             <div className="flex-1 overflow-hidden flex flex-col">
@@ -208,14 +275,6 @@ export function BloombergDashboard({
 
               {/* Add RektGPT Assistant as a fixed mini window */}
               <div className="flex-1 overflow-hidden flex flex-col">
-                <div className="bg-black p-1 border-b border-gray-800 flex justify-between items-center">
-                  <span className={`text-xs font-bold ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
-                    REKT AI ASSISTANT
-                  </span>
-                  <button className="text-gray-500 hover:text-white" onClick={toggleAiFullscreen}>
-                    <X size={12} />
-                  </button>
-                </div>
                 <div className="flex-1 overflow-auto">
                   <RektAIAssistant onMaximize={toggleAiFullscreen} onBackToDashboard={() => {}} />
                 </div>
@@ -224,6 +283,9 @@ export function BloombergDashboard({
           )}
         </div>
       </div>
+
+      {/* Add the footer back */}
+      <TerminalFooter />
     </div>
   )
 }
