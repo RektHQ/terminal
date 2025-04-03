@@ -52,35 +52,40 @@ interface RiskAlertWidgetProps {
   onClose?: () => void
   onMaximize?: () => void
   isMaximized?: boolean
-  id?: string
-  onDragStart?: () => void
-  onDragEnd?: (x: number, y: number) => void
-  onResize?: (width: number, height: number) => void
 }
 
-export function RiskAlertWidget({
-  onClose,
-  onMaximize,
-  isMaximized,
-  id,
-  onDragStart,
-  onDragEnd,
-  onResize,
-}: RiskAlertWidgetProps) {
+export function RiskAlertWidget({ onClose, onMaximize, isMaximized }: RiskAlertWidgetProps) {
   const { theme } = useTheme()
 
   const getRiskLevelColor = (level: string) => {
-    switch (level) {
-      case "critical":
-        return theme === "hacker" ? "text-red-500 bg-red-900/20" : "text-red-400 bg-red-900/30"
-      case "high":
-        return theme === "hacker" ? "text-orange-500 bg-orange-900/20" : "text-orange-400 bg-orange-900/30"
-      case "medium":
-        return theme === "hacker" ? "text-yellow-500 bg-yellow-900/20" : "text-yellow-400 bg-yellow-900/30"
-      case "low":
-        return theme === "hacker" ? "text-blue-500 bg-blue-900/20" : "text-blue-400 bg-blue-900/30"
-      default:
-        return "text-gray-400 bg-gray-800"
+    if (theme === "bw") {
+      // In black and white mode, use only grayscale
+      switch (level) {
+        case "critical":
+          return "text-white bg-white/20"
+        case "high":
+          return "text-white bg-white/15"
+        case "medium":
+          return "text-white bg-white/10"
+        case "low":
+          return "text-white bg-white/5"
+        default:
+          return "text-gray-400 bg-gray-800"
+      }
+    } else {
+      // In other themes, use colors
+      switch (level) {
+        case "critical":
+          return "text-red-500 bg-red-900/20"
+        case "high":
+          return "text-orange-500 bg-orange-900/20"
+        case "medium":
+          return "text-yellow-500 bg-yellow-900/20"
+        case "low":
+          return "text-blue-500 bg-blue-900/20"
+        default:
+          return "text-gray-400 bg-gray-800"
+      }
     }
   }
 
@@ -99,22 +104,8 @@ export function RiskAlertWidget({
     }
   }
 
-  const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp)
-    return date.toLocaleTimeString()
-  }
-
   return (
-    <DashboardWidget
-      title="RISK ALERTS"
-      onClose={onClose}
-      onMaximize={onMaximize}
-      isMaximized={isMaximized}
-      id={id}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onResize={onResize}
-    >
+    <DashboardWidget title="RISK ALERTS" onClose={onClose} onMaximize={onMaximize} isMaximized={isMaximized}>
       <div className="p-2 space-y-2">
         {mockRiskAlerts.map((alert) => (
           <div key={alert.id} className="border border-gray-800 p-2 rounded">
@@ -129,13 +120,8 @@ export function RiskAlertWidget({
                   {alert.protocol}
                 </span>
               </div>
-              <span className="text-gray-500 text-xs">{formatTime(alert.timestamp)}</span>
             </div>
             <p className="mt-1 text-sm text-gray-300">{alert.description}</p>
-            <div className="mt-1 flex items-center text-xs text-gray-400">
-              {getCategoryIcon(alert.category)}
-              <span className="uppercase">{alert.category}</span>
-            </div>
           </div>
         ))}
       </div>

@@ -23,6 +23,11 @@ export function ReferralBanner() {
     setShowShareOptions(!showShareOptions)
   }
 
+  const handleShare = (platform: string) => {
+    // In a real app, this would open the appropriate sharing dialog
+    alert(`Sharing via ${platform}. In a real app, this would open the ${platform} sharing dialog.`)
+  }
+
   return (
     <div className="w-full bg-[#050a24] p-4 my-4 rounded-md relative overflow-hidden">
       {/* Background stars */}
@@ -41,11 +46,11 @@ export function ReferralBanner() {
       </div>
 
       <div className="relative z-10">
-        <h3 className="text-xl font-bold text-white mb-2">GET 10% OF FRENS POINTS</h3>
+        <h3 className="text-xl font-bold text-white mb-2">JOIN THE REKT NETWORK</h3>
 
-        <p className="text-white mb-4">
-          You will earn 10% points of what your invitee earns and your friend will also enjoy the boost of 20% to their
-          points!
+        <p className="text-white text-sm mb-4">
+          Invite friends to join the Rekt AI intelligence network. Share exclusive insights and build your security
+          reputation.
         </p>
 
         <div className="flex justify-end">
@@ -83,15 +88,24 @@ export function ReferralBanner() {
             </div>
 
             <div className="flex justify-between mt-3">
-              <button className="px-3 py-1.5 rounded text-sm flex items-center bg-blue-900/30 text-blue-400 border border-blue-400/50 hover:bg-blue-900/50">
+              <button
+                className="px-3 py-1.5 rounded text-sm flex items-center bg-blue-900/30 text-blue-400 border border-blue-400/50 hover:bg-blue-900/50"
+                onClick={() => handleShare("Email")}
+              >
                 <Share2 size={14} className="mr-1.5" />
                 Share via Email
               </button>
-              <button className="px-3 py-1.5 rounded text-sm flex items-center bg-blue-900/30 text-blue-400 border border-blue-400/50 hover:bg-blue-900/50">
+              <button
+                className="px-3 py-1.5 rounded text-sm flex items-center bg-blue-900/30 text-blue-400 border border-blue-400/50 hover:bg-blue-900/50"
+                onClick={() => handleShare("Twitter")}
+              >
                 <Share2 size={14} className="mr-1.5" />
                 Share via Twitter
               </button>
-              <button className="px-3 py-1.5 rounded text-sm flex items-center bg-blue-900/30 text-blue-400 border border-blue-400/50 hover:bg-blue-900/50">
+              <button
+                className="px-3 py-1.5 rounded text-sm flex items-center bg-blue-900/30 text-blue-400 border border-blue-400/50 hover:bg-blue-900/50"
+                onClick={() => handleShare("Telegram")}
+              >
                 <Share2 size={14} className="mr-1.5" />
                 Share via Telegram
               </button>
@@ -102,4 +116,6 @@ export function ReferralBanner() {
     </div>
   )
 }
+
+export default ReferralBanner
 

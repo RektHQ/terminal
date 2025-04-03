@@ -119,7 +119,7 @@ export function SecurityReport({ fileName, vulnerabilities, riskScore, partners 
 
             {expandedVuln === vuln.id && (
               <div className="mt-2 pl-6">
-                <p className="text-gray-400 mb-2">{vuln.description}</p>
+                <div className="text-gray-400 text-xs mb-2">{vuln.description}</div>
 
                 {vuln.line && (
                   <p className="text-gray-500 text-sm mb-2">
@@ -128,14 +128,16 @@ export function SecurityReport({ fileName, vulnerabilities, riskScore, partners 
                   </p>
                 )}
 
-                {vuln.code && <pre className={`${codeClass} p-2 rounded mb-2 overflow-x-auto`}>{vuln.code}</pre>}
+                {vuln.code && (
+                  <pre className={`${codeClass} p-2 rounded mb-2 overflow-x-auto text-xs`}>{vuln.code}</pre>
+                )}
 
                 {vuln.recommendation && (
                   <div className="mb-2">
                     <span className={`${theme === "hacker" ? "text-green-500" : "text-white"} font-bold`}>
                       Recommendation:
                     </span>
-                    <p className="text-gray-400">{vuln.recommendation}</p>
+                    <p className="text-gray-400 text-xs">{vuln.recommendation}</p>
                   </div>
                 )}
 
@@ -186,4 +188,6 @@ export function SecurityReport({ fileName, vulnerabilities, riskScore, partners 
     </div>
   )
 }
+
+export default SecurityReport
 

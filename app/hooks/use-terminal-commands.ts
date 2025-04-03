@@ -42,6 +42,7 @@ export function useTerminalCommands() {
             { command: "subscribe", description: "View Rekt Exclusive Club subscription options" },
             { command: "about", description: "About Rekt AI Terminal" },
             { command: "dashboard", description: "Open the Rekt Intelligence Dashboard" },
+            { command: "rektdashboard", description: "Open the Rekt Dashboard interface" },
             { command: "bloomberg", description: "Open the Bloomberg-style multi-tab interface" },
             { command: "terminal", description: "Return to the terminal view" },
             { command: "roadmap", description: "Show the Rekt AI Terminal feature roadmap" },
@@ -256,6 +257,9 @@ SECURITY PARTNERSHIPS:
 
       case "dashboard":
         return { type: "dashboard" }
+
+      case "rektdashboard":
+        return { type: "rektdashboard" }
 
       case "bloomberg":
         return { type: "bloomberg" }

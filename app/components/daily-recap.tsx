@@ -55,14 +55,14 @@ export function DailyRecap({ recap }: DailyRecapProps) {
         </div>
       </div>
 
-      <div className={`${textClass} mb-4`}>{recap.summary}</div>
+      <div className={`${textClass} text-xs mb-4`}>{recap.summary}</div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div className={`border ${borderClass} p-3`}>
           <h4 className={`${headerClass} text-sm font-bold mb-2`}>Key Points</h4>
           <ul className="list-disc pl-4 space-y-1">
             {recap.keyPoints.map((point, idx) => (
-              <li key={idx} className="text-gray-400 text-sm">
+              <li key={idx} className="text-gray-400 text-xs">
                 {point}
               </li>
             ))}
@@ -159,4 +159,6 @@ export function DailyRecap({ recap }: DailyRecapProps) {
     </div>
   )
 }
+
+export default DailyRecap
 

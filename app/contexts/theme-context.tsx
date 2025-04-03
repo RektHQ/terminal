@@ -4,7 +4,7 @@ import type React from "react"
 
 import { createContext, useContext, useState, useEffect } from "react"
 
-type Theme = "hacker" | "rekt"
+type Theme = "hacker" | "soft" | "bw"
 
 interface ThemeContextType {
   theme: Theme
@@ -14,19 +14,20 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Update the default theme from "hacker" to "rekt"
-  const [theme, setTheme] = useState<Theme>("rekt")
+  // Update the default theme from "rekt" to "soft"
+  const [theme, setTheme] = useState<Theme>("soft")
 
   useEffect(() => {
     // Load theme from localStorage on initial render
     const savedTheme = localStorage.getItem("rekt-terminal-theme") as Theme | null
-    if (savedTheme && (savedTheme === "hacker" || savedTheme === "rekt")) {
+    if (savedTheme && (savedTheme === "hacker" || savedTheme === "soft" || savedTheme === "bw")) {
       setTheme(savedTheme)
     }
   }, [])
 
   const toggleTheme = () => {
-    const newTheme = theme === "hacker" ? "rekt" : "hacker"
+    // Cycle through the three themes: hacker -> soft -> bw -> hacker
+    const newTheme = theme === "hacker" ? "soft" : theme === "soft" ? "bw" : "hacker"
     setTheme(newTheme)
     localStorage.setItem("rekt-terminal-theme", newTheme)
   }

@@ -7,6 +7,7 @@ import { SecurityPartners } from "./security-partners"
 import { BountiesDisplay } from "./bounties-display"
 import { HackVisualization } from "./hack-visualization"
 import { NewsFeed } from "./news-feed"
+// Make sure we're using the named import
 import { DailyRecap } from "./daily-recap"
 import { ExploitStats } from "./exploit-stats"
 import { RektParlour } from "./rekt-parlour"
@@ -30,8 +31,9 @@ export function TerminalOutput({ content }: TerminalOutputProps) {
 
   // Helper function to get the appropriate text class based on theme and color
   const getTextClass = (hackerColor: string) => {
-    if (theme === "rekt") return "text-white font-mono"
-    return hackerColor
+    if (theme === "bw") return "text-white font-mono text-sm"
+    if (theme === "soft") return "text-white font-mono text-sm"
+    return hackerColor + " text-sm"
   }
 
   if (typeof content === "string") {
@@ -39,8 +41,9 @@ export function TerminalOutput({ content }: TerminalOutputProps) {
   }
 
   if (content.type === "welcome") {
-    const borderClass = theme === "hacker" ? "border-red-500/30" : "border-white/30"
-    const titleClass = theme === "hacker" ? "text-red-500" : "text-white"
+    const borderClass =
+      theme === "bw" ? "border-white/30" : theme === "hacker" ? "border-red-500/30" : "border-white/30"
+    const titleClass = theme === "bw" ? "text-white" : theme === "hacker" ? "text-red-500" : "text-white"
 
     return (
       <div className={`border ${borderClass} p-4 my-4 bg-black/50`}>
@@ -51,9 +54,16 @@ export function TerminalOutput({ content }: TerminalOutputProps) {
   }
 
   if (content.type === "help") {
-    const commandClass = theme === "hacker" ? "terminal-text-blue" : "text-white font-mono"
-    const descClass = theme === "hacker" ? "terminal-text" : "text-gray-400 font-mono"
-    const titleClass = theme === "hacker" ? "terminal-text-yellow mb-2" : "text-white font-mono mb-2"
+    const commandClass =
+      theme === "bw" ? "text-white font-mono" : theme === "hacker" ? "terminal-text-blue" : "text-white font-mono"
+    const descClass =
+      theme === "bw" ? "text-gray-400 font-mono" : theme === "hacker" ? "terminal-text" : "text-gray-400 font-mono"
+    const titleClass =
+      theme === "bw"
+        ? "text-white font-mono mb-2"
+        : theme === "hacker"
+          ? "terminal-text-yellow mb-2"
+          : "text-white font-mono mb-2"
 
     return (
       <div className="my-2">
@@ -69,10 +79,17 @@ export function TerminalOutput({ content }: TerminalOutputProps) {
   }
 
   if (content.type === "article-list") {
-    const titleClass = theme === "hacker" ? "terminal-text-yellow mb-2" : "text-white font-mono mb-2"
-    const idClass = theme === "hacker" ? "terminal-text-blue" : "text-white font-mono"
-    const dateClass = theme === "hacker" ? "terminal-text-red" : "text-gray-400 font-mono"
-    const borderClass = theme === "hacker" ? "border-gray-700" : "border-gray-600"
+    const titleClass =
+      theme === "bw"
+        ? "text-white font-mono mb-2"
+        : theme === "hacker"
+          ? "terminal-text-yellow mb-2"
+          : "text-white font-mono mb-2"
+    const idClass =
+      theme === "bw" ? "text-white font-mono" : theme === "hacker" ? "terminal-text-blue" : "text-white font-mono"
+    const dateClass =
+      theme === "bw" ? "text-gray-400 font-mono" : theme === "hacker" ? "terminal-text-red" : "text-gray-400 font-mono"
+    const borderClass = theme === "bw" ? "border-gray-600" : theme === "hacker" ? "border-gray-700" : "border-gray-600"
 
     return (
       <div className="my-2">
@@ -98,12 +115,26 @@ export function TerminalOutput({ content }: TerminalOutputProps) {
   }
 
   if (content.type === "article") {
-    const borderClass = theme === "hacker" ? "border-red-500/30" : "border-white/30"
-    const titleClass = theme === "hacker" ? "terminal-text-red" : "text-white font-mono"
-    const dateClass = theme === "hacker" ? "terminal-text-blue" : "text-gray-400 font-mono"
-    const tagClass = theme === "hacker" ? "bg-red-900/30 text-red-400" : "bg-gray-800 text-gray-300"
-    const buttonClass = theme === "hacker" ? "text-red-500 hover:text-red-400" : "text-white hover:text-gray-300"
-    const contentClass = theme === "hacker" ? "terminal-text" : "text-white font-mono"
+    const borderClass =
+      theme === "bw" ? "border-white/30" : theme === "hacker" ? "border-red-500/30" : "border-white/30"
+    const titleClass =
+      theme === "bw" ? "text-white font-mono" : theme === "hacker" ? "terminal-text-red" : "text-white font-mono"
+    const dateClass =
+      theme === "bw" ? "text-gray-400 font-mono" : theme === "hacker" ? "terminal-text-blue" : "text-gray-400 font-mono"
+    const tagClass =
+      theme === "bw"
+        ? "bg-gray-800 text-gray-300"
+        : theme === "hacker"
+          ? "bg-red-900/30 text-red-400"
+          : "bg-gray-800 text-gray-300"
+    const buttonClass =
+      theme === "bw"
+        ? "text-white hover:text-gray-300"
+        : theme === "hacker"
+          ? "text-red-500 hover:text-red-400"
+          : "text-white hover:text-gray-300"
+    const contentClass =
+      theme === "bw" ? "text-white font-mono" : theme === "hacker" ? "terminal-text" : "text-white font-mono"
 
     return (
       <div className={`my-4 border ${borderClass} p-4 bg-black/50`}>
@@ -128,8 +159,26 @@ export function TerminalOutput({ content }: TerminalOutputProps) {
         )}
         {content.article.lossAmount && (
           <div className="mt-4 flex items-center">
-            <span className={theme === "hacker" ? "terminal-text-red mr-2" : "text-white font-mono mr-2"}>DAMAGE:</span>
-            <span className={theme === "hacker" ? "terminal-text-yellow" : "text-gray-300 font-mono"}>
+            <span
+              className={
+                theme === "bw"
+                  ? "text-white font-mono mr-2"
+                  : theme === "hacker"
+                    ? "terminal-text-red mr-2"
+                    : "text-white font-mono mr-2"
+              }
+            >
+              DAMAGE:
+            </span>
+            <span
+              className={
+                theme === "bw"
+                  ? "text-gray-300 font-mono"
+                  : theme === "hacker"
+                    ? "terminal-text-yellow"
+                    : "text-gray-300 font-mono"
+              }
+            >
               ${content.article.lossAmount.toLocaleString()}
             </span>
           </div>
@@ -139,16 +188,34 @@ export function TerminalOutput({ content }: TerminalOutputProps) {
   }
 
   if (content.type === "error") {
-    return <div className={theme === "hacker" ? "terminal-text-red" : "text-red-300 font-mono"}>{content.message}</div>
+    return (
+      <div
+        className={
+          theme === "bw"
+            ? "text-red-300 font-mono"
+            : theme === "hacker"
+              ? "terminal-text-red"
+              : "text-red-300 font-mono"
+        }
+      >
+        {content.message}
+      </div>
+    )
   }
 
   if (content.type === "scan") {
-    const borderClass = theme === "hacker" ? "border-red-500/30" : "border-white/30"
-    const titleClass = theme === "hacker" ? "terminal-text-red" : "text-white font-mono"
-    const contentClass = theme === "hacker" ? "terminal-text" : "text-white font-mono"
-    const labelClass = theme === "hacker" ? "terminal-text-blue" : "text-gray-300 font-mono"
-    const valueClass = theme === "hacker" ? "terminal-text-yellow" : "text-white font-mono"
-    const vulnClass = theme === "hacker" ? "terminal-text-red" : "text-red-300 font-mono"
+    const borderClass =
+      theme === "bw" ? "border-white/30" : theme === "hacker" ? "border-red-500/30" : "border-white/30"
+    const titleClass =
+      theme === "bw" ? "text-white font-mono" : theme === "hacker" ? "terminal-text-red" : "text-white font-mono"
+    const contentClass =
+      theme === "bw" ? "text-white font-mono" : theme === "hacker" ? "terminal-text" : "text-white font-mono"
+    const labelClass =
+      theme === "bw" ? "text-gray-300 font-mono" : theme === "hacker" ? "terminal-text-blue" : "text-gray-300 font-mono"
+    const valueClass =
+      theme === "bw" ? "text-white font-mono" : theme === "hacker" ? "terminal-text-yellow" : "text-white font-mono"
+    const vulnClass =
+      theme === "bw" ? "text-red-300 font-mono" : theme === "hacker" ? "terminal-text-red" : "text-red-300 font-mono"
 
     return (
       <div className={`my-4 border ${borderClass} p-4 bg-black/50`}>

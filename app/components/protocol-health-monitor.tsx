@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useTheme } from "../contexts/theme-context"
-import { AlertTriangle, TrendingDown, TrendingUp, Activity, Search } from "lucide-react"
+import { TrendingDown, TrendingUp, Activity } from "lucide-react"
 
 interface ProtocolHealth {
   id: string
@@ -192,6 +192,27 @@ export function ProtocolHealthMonitor() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
   const chartRef = useRef<HTMLCanvasElement>(null)
 
+  const protocols = [
+    {
+      name: "Aave v3",
+      tvl: "$4.2B",
+      health: "healthy",
+      change: "+2.3%",
+    },
+    {
+      name: "Compound v3",
+      tvl: "$1.8B",
+      health: "warning",
+      change: "-0.5%",
+    },
+    {
+      name: "MakerDAO",
+      tvl: "$7.1B",
+      health: "healthy",
+      change: "+1.2%",
+    },
+  ]
+
   const filteredProtocols = mockProtocolData
     .filter(
       (protocol) =>
@@ -357,146 +378,200 @@ export function ProtocolHealthMonitor() {
   }, [selectedProtocol, theme])
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-2 border-b border-gray-800">
-        <div className="relative">
-          <Search size={14} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search protocols..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-800 rounded px-8 py-1 text-sm text-white focus:outline-none focus:border-gray-700"
-          />
-        </div>
-      </div>
+    // <div className="flex flex-col h-full">
+    //   <div className="p-2 border-b border-gray-800">
+    //     <div className="relative">
+    //       <Search size={14} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
+    //       <input
+    //         type="text"
+    //         placeholder="Search protocols..."
+    //         value={searchTerm}
+    //         onChange={(e) => setSearchTerm(e.target.value)}
+    //         className="w-full bg-gray-900 border border-gray-800 rounded px-8 py-1 text-sm text-white focus:outline-none focus:border-gray-700"
+    //       />
+    //     </div>
+    //   </div>
 
-      <div className="flex-1 flex">
-        {/* Protocol list */}
-        <div className="w-2/3 overflow-auto border-r border-gray-800">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className={`sticky top-0 bg-black ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
-                <th className="text-left p-2 cursor-pointer" onClick={() => handleSort("name")}>
-                  Protocol
-                </th>
-                <th className="text-left p-2">Category</th>
-                <th className="text-right p-2 cursor-pointer" onClick={() => handleSort("tvl")}>
-                  TVL
-                </th>
-                <th className="text-right p-2">TVL</th>
-                <th className="text-right p-2 cursor-pointer" onClick={() => handleSort("tvlChange24h")}>
-                  24h Change
-                </th>
-                <th className="text-right p-2 cursor-pointer" onClick={() => handleSort("healthScore")}>
-                  Health Score
-                </th>
-                <th className="text-center p-2">Trend</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProtocols.map((protocol) => (
-                <tr
-                  key={protocol.id}
-                  className={`border-b border-gray-800 hover:bg-gray-900 cursor-pointer ${selectedProtocol === protocol.id ? "bg-gray-900" : ""}`}
-                  onClick={() => setSelectedProtocol(protocol.id)}
-                >
-                  <td className={`p-2 ${theme === "hacker" ? "text-green-500" : "text-white"} font-bold`}>
-                    {protocol.name}
-                  </td>
-                  <td className="p-2 text-gray-300">{protocol.category}</td>
-                  <td className="p-2 text-right font-mono">{formatTVL(protocol.tvl)}</td>
-                  <td
-                    className={`p-2 text-right ${protocol.tvlChange24h >= 0 ? (theme === "hacker" ? "text-green-500" : "text-green-400") : theme === "hacker" ? "text-red-500" : "text-red-400"}`}
-                  >
-                    {protocol.tvlChange24h > 0 ? "+" : ""}
-                    {protocol.tvlChange24h.toFixed(1)}%
-                  </td>
-                  <td className={`p-2 text-right font-bold ${getHealthScoreColor(protocol.healthScore)}`}>
-                    {protocol.healthScore}
-                  </td>
-                  <td className="p-2 text-center">{getTrendIcon(protocol.healthTrend)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    //   <div className="flex-1 flex">
+    //     {/* Protocol list */}
+    //     <div className="w-2/3 overflow-auto border-r border-gray-800">
+    //       <table className="w-full text-sm">
+    //         <thead>
+    //           <tr className={`sticky top-0 bg-black ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
+    //             <th className="text-left p-2 cursor-pointer" onClick={() => handleSort("name")}>
+    //               Protocol
+    //             </th>
+    //             <th className="text-left p-2">Category</th>
+    //             <th className="text-right p-2 cursor-pointer" onClick={() => handleSort("tvl")}>
+    //               TVL
+    //             </th>
+    //             <th className="text-right p-2">TVL</th>
+    //             <th className="text-right p-2 cursor-pointer" onClick={() => handleSort("tvlChange24h")}>
+    //               24h Change
+    //             </th>
+    //             <th className="text-right p-2 cursor-pointer" onClick={() => handleSort("healthScore")}>
+    //               Health Score
+    //             </th>
+    //             <th className="text-center p-2">Trend</th>
+    //           </tr>
+    //         </thead>
+    //         <tbody>
+    //           {filteredProtocols.map((protocol) => (
+    //             <tr
+    //               key={protocol.id}
+    //               className={`border-b border-gray-800 hover:bg-gray-900 cursor-pointer ${selectedProtocol === protocol.id ? "bg-gray-900" : ""}`}
+    //               onClick={() => setSelectedProtocol(protocol.id)}
+    //             >
+    //               <td className={`p-2 ${theme === "hacker" ? "text-green-500" : "text-white"} font-bold`}>
+    //                 {protocol.name}
+    //               </td>
+    //               <td className="p-2 text-gray-300">{protocol.category}</td>
+    //               <td className="p-2 text-right font-mono">{formatTVL(protocol.tvl)}</td>
+    //               <td
+    //                 className={`p-2 text-right ${protocol.tvlChange24h >= 0 ? (theme === "hacker" ? "text-green-500" : "text-green-400") : theme === "hacker" ? "text-red-500" : "text-red-400"}`}
+    //               >
+    //                 {protocol.tvlChange24h > 0 ? "+" : ""}
+    //                 {protocol.tvlChange24h.toFixed(1)}%
+    //               </td>
+    //               <td className={`p-2 text-right font-bold ${getHealthScoreColor(protocol.healthScore)}`}>
+    //                 {protocol.healthScore}
+    //               </td>
+    //               <td className="p-2 text-center">{getTrendIcon(protocol.healthTrend)}</td>
+    //             </tr>
+    //           ))}
+    //         </tbody>
+    //       </table>
+    //     </div>
 
-        {/* Risk visualization */}
-        <div className="w-1/3 p-4 flex flex-col">
-          {selectedProtocol ? (
-            <>
-              <div className="mb-4">
-                <h3 className={`text-lg font-bold ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
-                  {mockProtocolData.find((p) => p.id === selectedProtocol)?.name} Risk Analysis
-                </h3>
-                <div className="flex items-center mt-1">
-                  <span className="text-gray-400 text-sm mr-2">Category:</span>
-                  <span className={`${theme === "hacker" ? "text-green-500" : "text-white"}`}>
-                    {mockProtocolData.find((p) => p.id === selectedProtocol)?.category}
-                  </span>
-                </div>
+    //     {/* Risk visualization */}
+    //     <div className="w-1/3 p-4 flex flex-col">
+    //       {selectedProtocol ? (
+    //         <>
+    //           <div className="mb-4">
+    //             <h3 className={`text-lg font-bold ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
+    //               {mockProtocolData.find((p) => p.id === selectedProtocol)?.name} Risk Analysis
+    //             </h3>
+    //             <div className="flex items-center mt-1">
+    //               <span className="text-gray-400 text-sm mr-2">Category:</span>
+    //               <span className={`${theme === "hacker" ? "text-green-500" : "text-white"}`}>
+    //                 {mockProtocolData.find((p) => p.id === selectedProtocol)?.category}
+    //               </span>
+    //             </div>
+    //           </div>
+    //           <div className="flex-1 bg-black/30 border border-gray-800 rounded">
+    //             <canvas ref={chartRef} width={400} height={300} className="w-full h-full" />
+    //           </div>
+
+    //           {/* Risk factors */}
+    //           <div className="mt-4">
+    //             <h4 className={`text-sm font-bold ${theme === "hacker" ? "text-red-500" : "text-white"} mb-2`}>
+    //               Risk Factors
+    //             </h4>
+    //             <div className="space-y-2">
+    //               {mockProtocolData
+    //                 .find((p) => p.id === selectedProtocol)
+    //                 ?.riskFactors.map((factor, idx) => (
+    //                   <div key={idx} className="flex justify-between items-center">
+    //                     <span className="text-sm text-gray-300">{factor.type}:</span>
+    //                     <div className="flex items-center">
+    //                       <div className="w-24 h-2 bg-gray-800 rounded-full mr-2">
+    //                         <div
+    //                           className={`h-full rounded-full ${factor.score > 20 ? "bg-red-500" : factor.score > 10 ? "bg-yellow-500" : "bg-green-500"}`}
+    //                           style={{ width: `${(factor.score / 30) * 100}%` }}
+    //                         />
+    //                       </div>
+    //                       <span className="text-xs text-gray-400">{factor.score}/30</span>
+    //                     </div>
+    //                   </div>
+    //                 ))}
+    //             </div>
+    //           </div>
+
+    //           {/* Last incident */}
+    //           {mockProtocolData.find((p) => p.id === selectedProtocol)?.lastIncident && (
+    //             <div className="mt-4 p-2 border border-gray-800 rounded bg-red-900/10">
+    //               <h4
+    //                 className={`text-sm font-bold ${theme === "hacker" ? "text-red-500" : "text-red-400"} flex items-center`}
+    //               >
+    //                 <AlertTriangle size={14} className="mr-1" />
+    //                 Last Security Incident
+    //               </h4>
+    //               <div className="mt-1 text-sm">
+    //                 <div className="flex justify-between">
+    //                   <span className="text-gray-300">
+    //                     {mockProtocolData.find((p) => p.id === selectedProtocol)?.lastIncident?.type}
+    //                   </span>
+    //                   <span className="text-gray-400">
+    //                     {mockProtocolData.find((p) => p.id === selectedProtocol)?.lastIncident?.date}
+    //                   </span>
+    //                 </div>
+    //                 <p className="text-gray-400 text-xs mt-1">
+    //                   {mockProtocolData.find((p) => p.id === selectedProtocol)?.lastIncident?.description}
+    //                 </p>
+    //               </div>
+    //             </div>
+    //           )}
+    //         </>
+    //       ) : (
+    //         <div className="flex items-center justify-center h-full text-gray-500">
+    //           Select a protocol to view risk analysis
+    //         </div>
+    //       )}
+    //     </div>
+    //   </div>
+    // </div>
+    <div className="p-2 h-full bg-black text-white">
+      <div className="space-y-2">
+        {protocols.map((protocol, index) => (
+          <div
+            key={index}
+            className={`p-2 border rounded flex items-center justify-between ${
+              theme === "bw"
+                ? "border-white/30 bg-white/5"
+                : protocol.health === "healthy"
+                  ? "border-green-500/30 bg-green-900/10"
+                  : protocol.health === "warning"
+                    ? "border-yellow-500/30 bg-yellow-900/10"
+                    : "border-red-500/30 bg-red-900/10"
+            }`}
+          >
+            <div className="flex items-center">
+              <div className="mr-2">
+                {theme === "bw" ? (
+                  <Activity size={16} className="text-white" />
+                ) : protocol.health === "healthy" ? (
+                  <Activity size={16} className="text-green-500" />
+                ) : protocol.health === "warning" ? (
+                  <Activity size={16} className="text-yellow-500" />
+                ) : (
+                  <Activity size={16} className="text-red-500" />
+                )}
               </div>
-              <div className="flex-1 bg-black/30 border border-gray-800 rounded">
-                <canvas ref={chartRef} width={400} height={300} className="w-full h-full" />
+              <div>
+                <div className="text-sm font-medium">{protocol.name}</div>
+                <div className="text-xs text-gray-400">TVL: {protocol.tvl}</div>
               </div>
-
-              {/* Risk factors */}
-              <div className="mt-4">
-                <h4 className={`text-sm font-bold ${theme === "hacker" ? "text-red-500" : "text-white"} mb-2`}>
-                  Risk Factors
-                </h4>
-                <div className="space-y-2">
-                  {mockProtocolData
-                    .find((p) => p.id === selectedProtocol)
-                    ?.riskFactors.map((factor, idx) => (
-                      <div key={idx} className="flex justify-between items-center">
-                        <span className="text-sm text-gray-300">{factor.type}:</span>
-                        <div className="flex items-center">
-                          <div className="w-24 h-2 bg-gray-800 rounded-full mr-2">
-                            <div
-                              className={`h-full rounded-full ${factor.score > 20 ? "bg-red-500" : factor.score > 10 ? "bg-yellow-500" : "bg-green-500"}`}
-                              style={{ width: `${(factor.score / 30) * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-gray-400">{factor.score}/30</span>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-
-              {/* Last incident */}
-              {mockProtocolData.find((p) => p.id === selectedProtocol)?.lastIncident && (
-                <div className="mt-4 p-2 border border-gray-800 rounded bg-red-900/10">
-                  <h4
-                    className={`text-sm font-bold ${theme === "hacker" ? "text-red-500" : "text-red-400"} flex items-center`}
-                  >
-                    <AlertTriangle size={14} className="mr-1" />
-                    Last Security Incident
-                  </h4>
-                  <div className="mt-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">
-                        {mockProtocolData.find((p) => p.id === selectedProtocol)?.lastIncident?.type}
-                      </span>
-                      <span className="text-gray-400">
-                        {mockProtocolData.find((p) => p.id === selectedProtocol)?.lastIncident?.date}
-                      </span>
-                    </div>
-                    <p className="text-gray-400 text-xs mt-1">
-                      {mockProtocolData.find((p) => p.id === selectedProtocol)?.lastIncident?.description}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-full text-gray-500">
-              Select a protocol to view risk analysis
             </div>
-          )}
-        </div>
+            <div className="flex items-center">
+              {protocol.change.startsWith("+") ? (
+                <TrendingUp size={14} className={theme === "bw" ? "text-white mr-1" : "text-green-500 mr-1"} />
+              ) : (
+                <TrendingDown size={14} className={theme === "bw" ? "text-white mr-1" : "text-red-500 mr-1"} />
+              )}
+              <span
+                className={
+                  theme === "bw"
+                    ? "text-white text-xs"
+                    : protocol.change.startsWith("+")
+                      ? "text-green-500 text-xs"
+                      : "text-red-500 text-xs"
+                }
+              >
+                {protocol.change}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

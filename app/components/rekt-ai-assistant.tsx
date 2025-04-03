@@ -4,8 +4,15 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useTheme } from "../contexts/theme-context"
-import { Send, Bot, User, Loader2, Maximize2, ArrowLeft, LayoutGrid } from "lucide-react"
-import { DashboardWidget } from "./dashboard-widget"
+import {
+  Send,
+  Bot,
+  Maximize2,
+  ArrowLeft,
+  LayoutGrid,
+  ArrowRightIcon as ArrowsMaximize,
+  ArrowLeftIcon as ArrowsMinimize,
+} from "lucide-react"
 
 interface Message {
   id: string
@@ -19,24 +26,60 @@ interface RektAIAssistantProps {
   onMaximize?: () => void
   onBackToDashboard?: () => void
   isFullscreen?: boolean
+  fullscreen?: boolean
+  onToggleFullscreen?: () => void
+  minimized?: boolean
+  onToggleMinimized?: () => void
+  onExecuteCommand?: (command: string) => void
 }
 
-// Update the RektAIAssistant component to work better with resizing
 export function RektAIAssistant({
   onClose,
   onMaximize,
   onBackToDashboard,
   isFullscreen = false,
+  fullscreen,
+  onToggleFullscreen,
+  minimized: minimizedProp,
+  onToggleMinimized,
+  onExecuteCommand,
 }: RektAIAssistantProps) {
   const { theme } = useTheme()
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [minimized, setMinimized] = useState(minimizedProp || false)
+
+  // Load minimized state from localStorage on component mount
+  useEffect(() => {
+    const savedMinimized = localStorage.getItem("aiAssistantMinimized")
+    if (savedMinimized !== null) {
+      setMinimized(savedMinimized === "true")
+    }
+  }, [])
+
+  // Add prompt examples at the beginning of the component
+  const promptExamples = [
+    "Analyze the security risks of Lido's stETH implementation",
+    "Explain the Euler Finance hack and its impact",
+    "What are the most common vulnerabilities in cross-chain bridges?",
+    "Compare flash loan attack vectors across DeFi protocols",
+    "How can I protect my protocol against oracle manipulation?",
+    "What security measures should I implement for my new DeFi project?",
+  ]
+
+  // Add a welcome message with examples
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "assistant",
       content:
         "Welcome to RektGPT. I'm trained on all Rekt News articles, on-chain data, and security incidents. How can I help you today?",
+      timestamp: new Date(),
+    },
+    {
+      id: "examples",
+      role: "assistant",
+      content: "Here are some examples of what you can ask me:",
       timestamp: new Date(),
     },
   ])
@@ -94,12 +137,30 @@ export function RektAIAssistant({
     }, 1500)
   }
 
+  // Toggle minimized state
+  const toggleMinimized = () => {
+    const newMinimized = !minimized
+    setMinimized(newMinimized)
+    localStorage.setItem("aiAssistantMinimized", String(newMinimized))
+
+    if (onToggleMinimized) {
+      onToggleMinimized()
+    }
+  }
+
   // Custom header with additional buttons
   const customHeader = (
     <div className="flex items-center justify-between w-full">
       <div className="flex items-center">
-        <Bot size={16} className={`${theme === "hacker" ? "text-green-500" : "text-blue-400"} mr-2`} />
-        <span className={`text-sm font-bold ${theme === "hacker" ? "text-red-500" : "text-white"}`}>
+        <Bot
+          size={16}
+          className={`${theme === "bw" ? "text-white" : theme === "hacker" ? "text-green-500" : "text-blue-400"} mr-2`}
+        />
+        <span
+          className={`text-sm font-bold ${
+            theme === "bw" ? "text-white" : theme === "hacker" ? "text-red-500" : "text-white"
+          }`}
+        >
           REKTGPT AI ASSISTANT
         </span>
       </div>
@@ -108,9 +169,11 @@ export function RektAIAssistant({
           <button
             onClick={onBackToDashboard}
             className={`p-1 rounded text-xs flex items-center ${
-              theme === "hacker"
-                ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
-                : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
+              theme === "bw"
+                ? "bg-white/20 text-white hover:bg-white/30"
+                : theme === "hacker"
+                  ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
+                  : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
             }`}
             title="Back to Dashboard"
           >
@@ -118,13 +181,28 @@ export function RektAIAssistant({
             <LayoutGrid size={12} />
           </button>
         )}
+        <button
+          onClick={toggleMinimized}
+          className={`p-1 rounded text-xs flex items-center ${
+            theme === "bw"
+              ? "bg-white/20 text-white hover:bg-white/30"
+              : theme === "hacker"
+                ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
+                : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
+          }`}
+          title={minimized ? "Expand" : "Minimize"}
+        >
+          {minimized ? <ArrowsMaximize size={12} /> : <ArrowsMinimize size={12} />}
+        </button>
         {onMaximize && (
           <button
             onClick={onMaximize}
             className={`p-1 rounded text-xs flex items-center ${
-              theme === "hacker"
-                ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
-                : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
+              theme === "bw"
+                ? "bg-white/20 text-white hover:bg-white/30"
+                : theme === "hacker"
+                  ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
+                  : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
             }`}
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           >
@@ -136,97 +214,61 @@ export function RektAIAssistant({
   )
 
   return (
-    <DashboardWidget
-      title=""
-      customHeader={customHeader}
-      onClose={onClose}
-      onMaximize={onMaximize}
-      isMaximized={isFullscreen}
-      defaultExpanded={true}
-      className="flex-1 h-full"
-    >
-      <div className="flex flex-col h-full">
-        <div className="flex-1 overflow-auto p-2 space-y-4">
-          {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.role === "assistant" ? "justify-start" : "justify-end"}`}>
-              <div
-                className={`max-w-[80%] rounded-lg p-3 ${
-                  message.role === "assistant"
-                    ? theme === "hacker"
-                      ? "bg-gray-900 border border-green-900"
-                      : "bg-gray-900 border border-gray-700"
-                    : theme === "hacker"
-                      ? "bg-green-900/20 border border-green-900"
-                      : "bg-blue-900/20 border border-blue-900"
-                }`}
-              >
-                <div className="flex items-center mb-1">
-                  {message.role === "assistant" ? (
-                    <Bot size={14} className={theme === "hacker" ? "text-green-500 mr-1" : "text-blue-400 mr-1"} />
-                  ) : (
-                    <User size={14} className="text-gray-400 mr-1" />
-                  )}
-                  <span
-                    className={`text-xs ${message.role === "assistant" ? (theme === "hacker" ? "text-green-500" : "text-blue-400") : "text-gray-400"}`}
-                  >
-                    {message.role === "assistant" ? "RektGPT" : "You"}
-                  </span>
-                  <span className="text-gray-500 text-xs ml-2">
-                    {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  </span>
-                </div>
-                <div className={`text-sm ${theme === "hacker" ? "terminal-text" : "text-white"}`}>
-                  {message.content}
-                </div>
-              </div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div
-                className={`max-w-[80%] rounded-lg p-3 ${
-                  theme === "hacker" ? "bg-gray-900 border border-green-900" : "bg-gray-900 border border-gray-700"
-                }`}
-              >
-                <div className="flex items-center">
-                  <Bot size={14} className={theme === "hacker" ? "text-green-500 mr-1" : "text-blue-400 mr-1"} />
-                  <span className={`text-xs ${theme === "hacker" ? "text-green-500" : "text-blue-400"}`}>RektGPT</span>
-                  <Loader2 size={14} className="ml-2 animate-spin text-gray-500" />
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
+    <div className="flex flex-col h-full w-full bg-black">
+      <div className="flex items-center justify-between p-1 border-b border-gray-800 bg-black w-full">
+        <div className="flex items-center">
+          <Bot size={16} className="text-blue-400 mr-2" />
+          <span className="text-sm font-bold text-white">REKTGPT AI ASSISTANT</span>
         </div>
-
-        <div className="p-2 border-t border-gray-800">
-          <form onSubmit={handleSubmit} className="flex items-center">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about hacks, risk analysis, or on-chain activity..."
-              className="flex-1 bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              className={`ml-2 p-2 rounded ${
-                theme === "hacker"
-                  ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
-                  : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
-              } disabled:opacity-50`}
-              disabled={!input.trim() || isLoading}
-            >
-              <Send size={16} />
-            </button>
-          </form>
-          <div className="mt-1 text-xs text-gray-500">
-            Trained on Rekt News archives, on-chain data, and security incidents through March 2025
-          </div>
+        <div className="flex items-center space-x-1">
+          <button
+            onClick={toggleMinimized}
+            className="text-gray-400 hover:text-white p-1"
+            title={minimized ? "Expand" : "Minimize"}
+          >
+            {minimized ? <ArrowsMaximize size={12} /> : <ArrowsMinimize size={12} />}
+          </button>
         </div>
       </div>
-    </DashboardWidget>
+
+      <div className="flex-1 overflow-auto p-2 space-y-4 bg-black w-full">
+        {!minimized && (
+          <>
+            <div className="flex justify-start w-full">
+              <div className="max-w-[80%] rounded-lg p-3 bg-gray-900 border border-gray-700">
+                <div className="flex items-center mb-1">
+                  <Bot size={14} className="text-blue-400 mr-1" />
+                  <span className="text-xs text-blue-400">RektGPT</span>
+                  <span className="text-gray-500 text-xs ml-2">09:54</span>
+                </div>
+                <div className="text-xs text-white">
+                  Welcome to RektGPT. I'm trained on all Rekt News articles, on-chain data, and security incidents. How
+                  can I help you today?
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 w-full">
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  placeholder="Ask about hacks, risk analysis, or on-chain activity..."
+                  className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                />
+                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-900/30 text-blue-400 p-1 rounded">
+                  <Send size={16} />
+                </button>
+              </div>
+              <div className="mt-1 text-xs text-gray-500">
+                Trained on Rekt News archives, on-chain data, and security incidents through March 2025
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   )
 }
+
+export default RektAIAssistant
 

@@ -31,7 +31,7 @@ export function TerminalFooter() {
         className={`bg-black border-t ${borderClass} p-2 text-xs ${isMobile ? "flex-col space-y-1" : "flex justify-between items-center"}`}
       >
         <div>REKT NEWS © 2020-2025</div>
-        {!isMobile && <div>INDEPENDENT JOURNALISM • NO MERCY • NO MALICE</div>}
+        {!isMobile && <div>THE DARK WEB OF DEFI • NO MERCY • NO MALICE</div>}
         <div className="flex items-center space-x-3">
           <div className="flex items-center">
             <Database size={12} className={theme === "hacker" ? "text-blue-500 mr-1" : "text-blue-400 mr-1"} />

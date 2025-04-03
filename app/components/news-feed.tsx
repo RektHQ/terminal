@@ -109,7 +109,7 @@ export function NewsFeed({ items, title, timeframe = "all" }: NewsFeedProps) {
                 </div>
               </div>
 
-              <div className={`${textClass} text-sm mb-2`}>{item.content}</div>
+              <div className={`${textClass} text-xs mb-2`}>{item.content}</div>
 
               <div className="flex justify-between items-center">
                 <div className="flex flex-wrap gap-1">
@@ -150,4 +150,6 @@ export function NewsFeed({ items, title, timeframe = "all" }: NewsFeedProps) {
     </div>
   )
 }
+
+export default NewsFeed
 
