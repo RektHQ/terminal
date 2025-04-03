@@ -9,7 +9,6 @@ import {
   Bot,
   Maximize2,
   ArrowLeft,
-  LayoutGrid,
   ArrowRightIcon as ArrowsMaximize,
   ArrowLeftIcon as ArrowsMinimize,
 } from "lucide-react"
@@ -48,6 +47,13 @@ export function RektAIAssistant({
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [minimized, setMinimized] = useState(minimizedProp || false)
+
+  // Update minimized state when prop changes
+  useEffect(() => {
+    if (minimizedProp !== undefined) {
+      setMinimized(minimizedProp)
+    }
+  }, [minimizedProp])
 
   // Load minimized state from localStorage on component mount
   useEffect(() => {
@@ -148,71 +154,6 @@ export function RektAIAssistant({
     }
   }
 
-  // Custom header with additional buttons
-  const customHeader = (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center">
-        <Bot
-          size={16}
-          className={`${theme === "bw" ? "text-white" : theme === "hacker" ? "text-green-500" : "text-blue-400"} mr-2`}
-        />
-        <span
-          className={`text-sm font-bold ${
-            theme === "bw" ? "text-white" : theme === "hacker" ? "text-red-500" : "text-white"
-          }`}
-        >
-          REKTGPT AI ASSISTANT
-        </span>
-      </div>
-      <div className="flex items-center space-x-2">
-        {onBackToDashboard && (
-          <button
-            onClick={onBackToDashboard}
-            className={`p-1 rounded text-xs flex items-center ${
-              theme === "bw"
-                ? "bg-white/20 text-white hover:bg-white/30"
-                : theme === "hacker"
-                  ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
-                  : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
-            }`}
-            title="Back to Dashboard"
-          >
-            <ArrowLeft size={12} className="mr-1" />
-            <LayoutGrid size={12} />
-          </button>
-        )}
-        <button
-          onClick={toggleMinimized}
-          className={`p-1 rounded text-xs flex items-center ${
-            theme === "bw"
-              ? "bg-white/20 text-white hover:bg-white/30"
-              : theme === "hacker"
-                ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
-                : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
-          }`}
-          title={minimized ? "Expand" : "Minimize"}
-        >
-          {minimized ? <ArrowsMaximize size={12} /> : <ArrowsMinimize size={12} />}
-        </button>
-        {onMaximize && (
-          <button
-            onClick={onMaximize}
-            className={`p-1 rounded text-xs flex items-center ${
-              theme === "bw"
-                ? "bg-white/20 text-white hover:bg-white/30"
-                : theme === "hacker"
-                  ? "bg-green-900/30 text-green-500 hover:bg-green-900/50"
-                  : "bg-blue-900/30 text-blue-400 hover:bg-blue-900/50"
-            }`}
-            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-          >
-            <Maximize2 size={14} />
-          </button>
-        )}
-      </div>
-    </div>
-  )
-
   return (
     <div className="flex flex-col h-full w-full bg-black">
       <div className="flex items-center justify-between p-1 border-b border-gray-800 bg-black w-full">
@@ -228,43 +169,63 @@ export function RektAIAssistant({
           >
             {minimized ? <ArrowsMaximize size={12} /> : <ArrowsMinimize size={12} />}
           </button>
+          {onToggleFullscreen && (
+            <button
+              onClick={onToggleFullscreen}
+              className="text-gray-400 hover:text-white p-1"
+              title={fullscreen ? "Exit Fullscreen" : "Fullscreen"}
+            >
+              <Maximize2 size={14} />
+            </button>
+          )}
+          {onClose && (
+            <button onClick={onClose} className="text-gray-400 hover:text-white p-1" title="Close">
+              <ArrowLeft size={14} />
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto p-2 space-y-4 bg-black w-full">
-        {!minimized && (
-          <>
-            <div className="flex justify-start w-full">
-              <div className="max-w-[80%] rounded-lg p-3 bg-gray-900 border border-gray-700">
-                <div className="flex items-center mb-1">
-                  <Bot size={14} className="text-blue-400 mr-1" />
-                  <span className="text-xs text-blue-400">RektGPT</span>
-                  <span className="text-gray-500 text-xs ml-2">09:54</span>
-                </div>
-                <div className="text-xs text-white">
-                  Welcome to RektGPT. I'm trained on all Rekt News articles, on-chain data, and security incidents. How
-                  can I help you today?
-                </div>
-              </div>
+      <div className={`flex-1 overflow-auto p-2 space-y-4 bg-black w-full ${minimized ? "hidden" : ""}`}>
+        <div className="flex justify-start w-full">
+          <div className="max-w-[80%] rounded-lg p-3 bg-gray-900 border border-gray-700">
+            <div className="flex items-center mb-1">
+              <Bot size={14} className="text-blue-400 mr-1" />
+              <span className="text-xs text-blue-400">RektGPT</span>
+              <span className="text-gray-500 text-xs ml-2">09:54</span>
             </div>
+            <div className="text-xs text-white">
+              Welcome to RektGPT. I'm trained on all Rekt News articles, on-chain data, and security incidents. How can
+              I help you today?
+            </div>
+          </div>
+        </div>
 
-            <div className="mt-4 w-full">
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  placeholder="Ask about hacks, risk analysis, or on-chain activity..."
-                  className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-                />
-                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-900/30 text-blue-400 p-1 rounded">
-                  <Send size={16} />
-                </button>
-              </div>
-              <div className="mt-1 text-xs text-gray-500">
-                Trained on Rekt News archives, on-chain data, and security incidents through March 2025
-              </div>
-            </div>
-          </>
-        )}
+        <div className="mt-4 w-full">
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Ask about hacks, risk analysis, or on-chain activity..."
+              className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSubmit(e)
+                }
+              }}
+            />
+            <button
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-900/30 text-blue-400 p-1 rounded"
+              onClick={handleSubmit}
+            >
+              <Send size={16} />
+            </button>
+          </div>
+          <div className="mt-1 text-xs text-gray-500">
+            Trained on Rekt News archives, on-chain data, and security incidents through March 2025
+          </div>
+        </div>
       </div>
     </div>
   )

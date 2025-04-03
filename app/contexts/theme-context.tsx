@@ -25,11 +25,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  // Apply theme to HTML element
+  useEffect(() => {
+    // Remove all theme data attributes
+    document.documentElement.removeAttribute("data-theme")
+
+    // Add the current theme data attribute
+    document.documentElement.setAttribute("data-theme", theme)
+
+    // Save theme to localStorage
+    localStorage.setItem("rekt-terminal-theme", theme)
+  }, [theme])
+
   const toggleTheme = () => {
     // Cycle through the three themes: hacker -> soft -> bw -> hacker
     const newTheme = theme === "hacker" ? "soft" : theme === "soft" ? "bw" : "hacker"
     setTheme(newTheme)
-    localStorage.setItem("rekt-terminal-theme", newTheme)
   }
 
   return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>

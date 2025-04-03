@@ -7,7 +7,8 @@ import { RektAIAssistant } from "./components/rekt-ai-assistant"
 import { ThemeProvider } from "./contexts/theme-context"
 
 export default function Home() {
-  const [view, setView] = useState<"terminal" | "bloomberg">("terminal")
+  // Change default view to "bloomberg" (dashboard)
+  const [view, setView] = useState<"terminal" | "bloomberg">("bloomberg")
   const [showAIConsole, setShowAIConsole] = useState(false)
   const [aiFullscreen, setAIFullscreen] = useState(false)
   const [aiMinimized, setAIMinimized] = useState(false)

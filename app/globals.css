@@ -1,104 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Add this at the top of your globals.css file, after the existing CSS */
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
-  }
-
-  [data-theme="hacker"] {
-    --background: 0 0% 0%;
-    --foreground: 120 100% 50%;
-    --card: 0 0% 3%;
-    --card-foreground: 120 100% 50%;
-    --popover: 0 0% 3%;
-    --popover-foreground: 120 100% 50%;
-    --primary: 120 100% 50%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 120 100% 10%;
-    --secondary-foreground: 120 100% 50%;
-    --muted: 0 0% 10%;
-    --muted-foreground: 120 100% 40%;
-    --accent: 120 100% 10%;
-    --accent-foreground: 120 100% 50%;
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 0 0% 0%;
-    --border: 120 100% 20%;
-    --input: 120 100% 20%;
-    --ring: 120 100% 50%;
-  }
-
-  [data-theme="rekt"] {
-    --background: 220 20% 10%;
-    --foreground: 0 0% 95%;
-    --card: 220 20% 13%;
-    --card-foreground: 0 0% 95%;
-    --popover: 220 20% 13%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 345 100% 50%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 16%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 220 20% 16%;
-    --muted-foreground: 220 20% 70%;
-    --accent: 345 100% 30%;
-    --accent-foreground: 0 0% 95%;
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 345 100% 50%;
-  }
-
-  [data-theme="bw"] {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 5%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 70%;
-    --accent: 0 0% 25%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 0% 100%;
-    --destructive-foreground: 0 0% 0%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 100%;
-    --chart-1: 0 0% 80%;
-    --chart-2: 0 0% 60%;
-    --chart-3: 0 0% 40%;
-    --chart-4: 0 0% 30%;
-    --chart-5: 0 0% 20%;
-  }
+/* Enhanced black and white mode to apply to ALL elements */
+[data-theme="bw"] * {
+  color-scheme: light dark !important;
+  filter: grayscale(100%) !important;
 }
 
-/* Add these additional styles to ensure all colored elements use grayscale in bw mode */
+/* Ensure all colored elements use grayscale in bw mode */
 [data-theme="bw"] .text-green-500,
 [data-theme="bw"] .text-green-400,
 [data-theme="bw"] .text-red-500,
@@ -110,7 +18,15 @@
 [data-theme="bw"] .text-orange-500,
 [data-theme="bw"] .text-orange-400,
 [data-theme="bw"] .text-purple-500,
-[data-theme="bw"] .text-purple-400 {
+[data-theme="bw"] .text-purple-400,
+[data-theme="bw"] .text-cyan-500,
+[data-theme="bw"] .text-cyan-400,
+[data-theme="bw"] .text-indigo-500,
+[data-theme="bw"] .text-indigo-400,
+[data-theme="bw"] .text-pink-500,
+[data-theme="bw"] .text-pink-400,
+[data-theme="bw"] .text-teal-500,
+[data-theme="bw"] .text-teal-400 {
   color: white !important;
 }
 
@@ -119,7 +35,31 @@
 [data-theme="bw"] .bg-blue-900\/20,
 [data-theme="bw"] .bg-yellow-900\/20,
 [data-theme="bw"] .bg-orange-900\/20,
-[data-theme="bw"] .bg-purple-900\/20 {
+[data-theme="bw"] .bg-purple-900\/20,
+[data-theme="bw"] .bg-cyan-900\/20,
+[data-theme="bw"] .bg-indigo-900\/20,
+[data-theme="bw"] .bg-pink-900\/20,
+[data-theme="bw"] .bg-teal-900\/20,
+[data-theme="bw"] .bg-green-900\/30,
+[data-theme="bw"] .bg-red-900\/30,
+[data-theme="bw"] .bg-blue-900\/30,
+[data-theme="bw"] .bg-yellow-900\/30,
+[data-theme="bw"] .bg-orange-900\/30,
+[data-theme="bw"] .bg-purple-900\/30,
+[data-theme="bw"] .bg-cyan-900\/30,
+[data-theme="bw"] .bg-indigo-900\/30,
+[data-theme="bw"] .bg-pink-900\/30,
+[data-theme="bw"] .bg-teal-900\/30,
+[data-theme="bw"] .bg-green-900\/50,
+[data-theme="bw"] .bg-red-900\/50,
+[data-theme="bw"] .bg-blue-900\/50,
+[data-theme="bw"] .bg-yellow-900\/50,
+[data-theme="bw"] .bg-orange-900\/50,
+[data-theme="bw"] .bg-purple-900\/50,
+[data-theme="bw"] .bg-cyan-900\/50,
+[data-theme="bw"] .bg-indigo-900\/50,
+[data-theme="bw"] .bg-pink-900\/50,
+[data-theme="bw"] .bg-teal-900\/50 {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
@@ -128,7 +68,21 @@
 [data-theme="bw"] .border-blue-500,
 [data-theme="bw"] .border-yellow-500,
 [data-theme="bw"] .border-orange-500,
-[data-theme="bw"] .border-purple-500 {
+[data-theme="bw"] .border-purple-500,
+[data-theme="bw"] .border-cyan-500,
+[data-theme="bw"] .border-indigo-500,
+[data-theme="bw"] .border-pink-500,
+[data-theme="bw"] .border-teal-500,
+[data-theme="bw"] .border-green-500\/30,
+[data-theme="bw"] .border-red-500\/30,
+[data-theme="bw"] .border-blue-500\/30,
+[data-theme="bw"] .border-yellow-500\/30,
+[data-theme="bw"] .border-orange-500\/30,
+[data-theme="bw"] .border-purple-500\/30,
+[data-theme="bw"] .border-cyan-500\/30,
+[data-theme="bw"] .border-indigo-500\/30,
+[data-theme="bw"] .border-pink-500\/30,
+[data-theme="bw"] .border-teal-500\/30 {
   border-color: rgba(255, 255, 255, 0.5) !important;
 }
 
@@ -137,8 +91,130 @@
 [data-theme="bw"] .bg-blue-500,
 [data-theme="bw"] .bg-yellow-500,
 [data-theme="bw"] .bg-orange-500,
-[data-theme="bw"] .bg-purple-500 {
+[data-theme="bw"] .bg-purple-500,
+[data-theme="bw"] .bg-cyan-500,
+[data-theme="bw"] .bg-indigo-500,
+[data-theme="bw"] .bg-pink-500,
+[data-theme="bw"] .bg-teal-500 {
   background-color: white !important;
+}
+
+/* Force all SVG elements to be grayscale in BW mode */
+[data-theme="bw"] svg * {
+  stroke: currentColor !important;
+  fill: currentColor !important;
+}
+
+/* Force all images to be grayscale in BW mode */
+[data-theme="bw"] img {
+  filter: grayscale(100%) !important;
+}
+
+/* Force all buttons to use grayscale colors in BW mode */
+[data-theme="bw"] button {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="bw"] button:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Force all links to use grayscale colors in BW mode */
+[data-theme="bw"] a {
+  color: white !important;
+}
+
+[data-theme="bw"] a:hover {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Force all inputs to use grayscale colors in BW mode */
+[data-theme="bw"] input {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Force all emoji to be grayscale in BW mode */
+[data-theme="bw"] span:has(emoji) {
+  filter: grayscale(100%) !important;
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
 }
 
 @layer base {
@@ -150,6 +226,75 @@
   }
 }
 
+/* Enhance black and white mode to apply to ALL elements */
+[data-theme="bw"] * {
+  color-scheme: light dark;
+  filter: grayscale(100%) !important;
+}
+
+/* Ensure all colored elements use grayscale in bw mode */
+[data-theme="bw"] .text-green-500,
+[data-theme="bw"] .text-green-400,
+[data-theme="bw"] .text-red-500,
+[data-theme="bw"] .text-red-400,
+[data-theme="bw"] .text-blue-500,
+[data-theme="bw"] .text-blue-400,
+[data-theme="bw"] .text-yellow-500,
+[data-theme="bw"] .text-yellow-400,
+[data-theme="bw"] .text-orange-500,
+[data-theme="bw"] .text-orange-400,
+[data-theme="bw"] .text-purple-500,
+[data-theme="bw"] .text-purple-400,
+[data-theme="bw"] .text-cyan-500,
+[data-theme="bw"] .text-cyan-400 {
+  color: white !important;
+}
+
+[data-theme="bw"] .bg-green-900\/20,
+[data-theme="bw"] .bg-red-900\/20,
+[data-theme="bw"] .bg-blue-900\/20,
+[data-theme="bw"] .bg-yellow-900\/20,
+[data-theme="bw"] .bg-orange-900\/20,
+[data-theme="bw"] .bg-purple-900\/20,
+[data-theme="bw"] .bg-cyan-900\/20,
+[data-theme="bw"] .bg-green-900\/30,
+[data-theme="bw"] .bg-red-900\/30,
+[data-theme="bw"] .bg-blue-900\/30,
+[data-theme="bw"] .bg-yellow-900\/30,
+[data-theme="bw"] .bg-orange-900\/30,
+[data-theme="bw"] .bg-purple-900\/30,
+[data-theme="bw"] .bg-cyan-900\/30,
+[data-theme="bw"] .bg-green-900\/50,
+[data-theme="bw"] .bg-red-900\/50,
+[data-theme="bw"] .bg-blue-900\/50,
+[data-theme="bw"] .bg-yellow-900\/50,
+[data-theme="bw"] .bg-orange-900\/50,
+[data-theme="bw"] .bg-purple-900\/50,
+[data-theme="bw"] .bg-cyan-900\/50 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="bw"] .border-green-500,
+[data-theme="bw"] .border-red-500,
+[data-theme="bw"] .border-blue-500,
+[data-theme="bw"] .border-yellow-500,
+[data-theme="bw"] .border-orange-500,
+[data-theme="bw"] .border-purple-500,
+[data-theme="bw"] .border-cyan-500 {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="bw"] .bg-green-500,
+[data-theme="bw"] .bg-red-500,
+[data-theme="bw"] .bg-blue-500,
+[data-theme="bw"] .bg-yellow-500,
+[data-theme="bw"] .bg-orange-500,
+[data-theme="bw"] .bg-purple-500,
+[data-theme="bw"] .bg-cyan-500 {
+  background-color: white !important;
+}
+
+/* Additional styles for the terminal and dashboard */
 .terminal-container {
   @apply flex flex-col h-screen bg-background text-foreground font-mono;
 }

@@ -47,6 +47,7 @@ export function DashboardWidget({
     }
   }, [isMaximized])
 
+  // This function toggles the minimized state
   const toggleMinimize = () => {
     setMinimized(!minimized)
   }
@@ -99,6 +100,7 @@ export function DashboardWidget({
           </>
         )}
       </div>
+      {/* Apply the minimized class to hide content when minimized */}
       <div
         className={`flex-1 overflow-auto ${expanded ? "" : "max-h-40"} ${minimized ? "hidden" : ""} bg-black w-full`}
       >

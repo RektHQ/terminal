@@ -40,6 +40,8 @@ export default function DashboardLayout({
   const isMobile = useIsMobile()
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [showAIConsole, setShowAIConsole] = useState(false)
+  const [aiFullscreen, setAIFullscreen] = useState(false)
 
   const handleExecuteCommand = (command: string) => {
     if (command === "terminal" && onClose) {
@@ -49,6 +51,10 @@ export default function DashboardLayout({
     if (onExecuteCommand) {
       onExecuteCommand(command)
     }
+  }
+
+  const handleOpenAIConsole = () => {
+    setShowAIConsole(true)
   }
 
   return (
@@ -61,6 +67,7 @@ export default function DashboardLayout({
           isFullscreen={isFullscreen}
           onToggleFullscreen={onToggleFullscreen}
           onClose={onClose || (() => {})}
+          onOpenAIConsole={handleOpenAIConsole}
         />
         <MarketTicker />
 
@@ -145,7 +152,7 @@ export default function DashboardLayout({
               height: "calc(100vh - 150px)",
               overflowY: "auto",
               overflowX: "hidden",
-              width: "calc(100% - 384px)", // Subtract the AI assistant width
+              width: showAIConsole ? "calc(100% - 384px)" : "100%", // Adjust width based on AI console visibility
             }}
           >
             <div className="grid grid-cols-2 gap-2 h-full">
@@ -207,9 +214,16 @@ export default function DashboardLayout({
           </div>
 
           {/* Right column: AI Assistant */}
-          <div className="w-96 border-l border-gray-800 bg-black">
-            <RektAIAssistant onExecuteCommand={onExecuteCommand || handleExecuteCommand} isFullscreen={false} />
-          </div>
+          {showAIConsole && (
+            <div className="w-96 border-l border-gray-800 bg-black">
+              <RektAIAssistant
+                onClose={() => setShowAIConsole(false)}
+                fullscreen={aiFullscreen}
+                onToggleFullscreen={() => setAIFullscreen(!aiFullscreen)}
+                onExecuteCommand={onExecuteCommand || handleExecuteCommand}
+              />
+            </div>
+          )}
         </div>
 
         {/* Footer */}

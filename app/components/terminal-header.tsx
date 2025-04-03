@@ -18,14 +18,9 @@ export function TerminalHeader({
   onExecuteCommand,
   isFullscreen = false,
   onToggleFullscreen = () => {},
-  onClose,
+  onClose = () => {},
   onOpenAIConsole,
-}: {
-  onExecuteCommand?: (command: string) => void
-  isFullscreen?: boolean
-  onToggleFullscreen?: () => void
-  onClose?: () => void
-}) {
+}: TerminalHeaderProps) {
   const { theme, toggleTheme } = useTheme()
   const points = mockUserPoints.totalPoints
   const isMobile = useIsMobile()
