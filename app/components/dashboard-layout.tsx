@@ -19,6 +19,7 @@ import { useIsMobile } from "../hooks/use-mobile"
 import { SecurityAlerts } from "./security-alerts"
 import { ProtocolHealthMonitor } from "./protocol-health-monitor"
 import { MarketDataVisualization } from "./market-data-visualization"
+import { SubscriptionBanner } from "./subscription-banner"
 
 interface DashboardLayoutProps {
   onClose?: () => void
@@ -62,6 +63,9 @@ export default function DashboardLayout({
           onClose={onClose || (() => {})}
         />
         <MarketTicker />
+
+        {/* Subscription Banner */}
+        <SubscriptionBanner />
 
         {/* Dashboard title bar */}
         <div className="flex justify-between items-center p-2 border-b border-gray-800 bg-black">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useTheme } from "../contexts/theme-context"
-import { Crown, X, Check } from "lucide-react"
+import { Crown, X, Check, Users, Shield, Database } from "lucide-react"
 import { useState } from "react"
 
 export function SubscriptionBanner() {
@@ -10,6 +10,7 @@ export function SubscriptionBanner() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [showReferralModal, setShowReferralModal] = useState(false)
   const [activeTab, setActiveTab] = useState<"retail" | "enterprise" | "api">("retail")
+  const [referralCopied, setReferralCopied] = useState(false)
 
   if (!isVisible) return null
 
@@ -21,18 +22,35 @@ export function SubscriptionBanner() {
     setShowReferralModal(true)
   }
 
+  const handleCopyReferralLink = () => {
+    navigator.clipboard.writeText("https://rekt.news/ref/REKT12345")
+    setReferralCopied(true)
+    setTimeout(() => setReferralCopied(false), 2000)
+  }
+
   return (
     <>
       <div
         className={`w-full ${
           theme === "hacker"
             ? "bg-gradient-to-r from-black via-red-950 to-black border-b border-red-500/30"
-            : "bg-gradient-to-r from-black via-gray-900 to-black border-b border-white/30"
+            : theme === "bw"
+              ? "bg-gradient-to-r from-black via-gray-900 to-black border-b border-white/30"
+              : "bg-gradient-to-r from-black via-gray-900 to-black border-b border-white/30"
         } py-2 px-4`}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Crown className={theme === "hacker" ? "text-yellow-500 mr-2" : "text-yellow-400 mr-2"} size={18} />
+            <Crown
+              className={
+                theme === "hacker"
+                  ? "text-yellow-500 mr-2"
+                  : theme === "bw"
+                    ? "text-white mr-2"
+                    : "text-yellow-400 mr-2"
+              }
+              size={18}
+            />
             <span className={theme === "hacker" ? "text-red-500 font-bold" : "text-white font-bold"}>
               Upgrade to Rekt Pro
             </span>
@@ -47,7 +65,9 @@ export function SubscriptionBanner() {
               className={`mr-2 px-3 py-1 rounded text-sm ${
                 theme === "hacker"
                   ? "bg-red-900/50 text-red-500 hover:bg-red-900/70"
-                  : "bg-white/20 text-white hover:bg-white/30"
+                  : theme === "bw"
+                    ? "bg-white/20 text-white hover:bg-white/30"
+                    : "bg-white/20 text-white hover:bg-white/30"
               }`}
             >
               Upgrade Now
@@ -57,7 +77,9 @@ export function SubscriptionBanner() {
               className={`mr-4 px-3 py-1 rounded text-sm ${
                 theme === "hacker"
                   ? "bg-green-900/50 text-green-500 hover:bg-green-900/70"
-                  : "bg-blue-900/20 text-blue-400 hover:bg-blue-900/30"
+                  : theme === "bw"
+                    ? "bg-white/10 text-white hover:bg-white/20"
+                    : "bg-blue-900/20 text-blue-400 hover:bg-blue-900/30"
               }`}
             >
               Refer Friend
@@ -77,7 +99,7 @@ export function SubscriptionBanner() {
       {showUpgradeModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div
-            className={`bg-gray-900 border ${theme === "hacker" ? "border-red-500" : "border-white"} p-6 rounded-md max-w-4xl w-full`}
+            className={`bg-gray-900 border ${theme === "hacker" ? "border-red-500" : theme === "bw" ? "border-white" : "border-white"} p-6 rounded-md max-w-4xl w-full`}
           >
             <h3 className={`${theme === "hacker" ? "text-red-500" : "text-white"} text-lg font-bold mb-4`}>
               Upgrade to Rekt Pro
@@ -90,36 +112,51 @@ export function SubscriptionBanner() {
                   activeTab === "retail"
                     ? theme === "hacker"
                       ? "text-red-500 border-b-2 border-red-500"
-                      : "text-white border-b-2 border-white"
+                      : theme === "bw"
+                        ? "text-white border-b-2 border-white"
+                        : "text-white border-b-2 border-white"
                     : "text-gray-400"
                 }`}
                 onClick={() => setActiveTab("retail")}
               >
-                Retail Packages
+                <div className="flex items-center">
+                  <Users size={16} className="mr-2" />
+                  Retail Packages
+                </div>
               </button>
               <button
                 className={`px-4 py-2 ${
                   activeTab === "enterprise"
                     ? theme === "hacker"
                       ? "text-red-500 border-b-2 border-red-500"
-                      : "text-white border-b-2 border-white"
+                      : theme === "bw"
+                        ? "text-white border-b-2 border-white"
+                        : "text-white border-b-2 border-white"
                     : "text-gray-400"
                 }`}
                 onClick={() => setActiveTab("enterprise")}
               >
-                Enterprise
+                <div className="flex items-center">
+                  <Shield size={16} className="mr-2" />
+                  Enterprise
+                </div>
               </button>
               <button
                 className={`px-4 py-2 ${
                   activeTab === "api"
                     ? theme === "hacker"
                       ? "text-red-500 border-b-2 border-red-500"
-                      : "text-white border-b-2 border-white"
+                      : theme === "bw"
+                        ? "text-white border-b-2 border-white"
+                        : "text-white border-b-2 border-white"
                     : "text-gray-400"
                 }`}
                 onClick={() => setActiveTab("api")}
               >
-                API Access
+                <div className="flex items-center">
+                  <Database size={16} className="mr-2" />
+                  API Access
+                </div>
               </button>
             </div>
 
@@ -127,7 +164,7 @@ export function SubscriptionBanner() {
             {activeTab === "retail" && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div
-                  className={`p-4 border ${theme === "hacker" ? "border-red-500/30" : "border-gray-700"} rounded-md`}
+                  className={`p-4 border ${theme === "hacker" ? "border-red-500/30" : theme === "bw" ? "border-gray-700" : "border-gray-700"} rounded-md`}
                 >
                   <h4 className="font-bold text-lg mb-2">Rekt Club</h4>
                   <div className="flex items-baseline mb-2">
@@ -150,14 +187,14 @@ export function SubscriptionBanner() {
                     </li>
                   </ul>
                   <button
-                    className={`w-full py-2 rounded ${theme === "hacker" ? "bg-red-900/50 text-red-500" : "bg-white/20 text-white"}`}
+                    className={`w-full py-2 rounded ${theme === "hacker" ? "bg-red-900/50 text-red-500" : theme === "bw" ? "bg-white/20 text-white" : "bg-white/20 text-white"}`}
                   >
                     Subscribe
                   </button>
                 </div>
 
                 <div
-                  className={`p-4 border ${theme === "hacker" ? "border-green-500" : "border-white"} rounded-md bg-black/30 relative`}
+                  className={`p-4 border ${theme === "hacker" ? "border-green-500" : theme === "bw" ? "border-white" : "border-white"} rounded-md bg-black/30 relative`}
                 >
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-black px-3 py-0.5 rounded-full text-xs font-bold">
                     POPULAR
@@ -183,14 +220,14 @@ export function SubscriptionBanner() {
                     </li>
                   </ul>
                   <button
-                    className={`w-full py-2 rounded ${theme === "hacker" ? "bg-green-500 text-black" : "bg-white text-black"}`}
+                    className={`w-full py-2 rounded ${theme === "hacker" ? "bg-green-500 text-black" : theme === "bw" ? "bg-white text-black" : "bg-white text-black"}`}
                   >
                     Subscribe
                   </button>
                 </div>
 
                 <div
-                  className={`p-4 border ${theme === "hacker" ? "border-red-500/30" : "border-gray-700"} rounded-md`}
+                  className={`p-4 border ${theme === "hacker" ? "border-red-500/30" : theme === "bw" ? "border-gray-700" : "border-gray-700"} rounded-md`}
                 >
                   <h4 className="font-bold text-lg mb-2">Rekt OG</h4>
                   <div className="flex items-baseline mb-2">
@@ -213,7 +250,7 @@ export function SubscriptionBanner() {
                     </li>
                   </ul>
                   <button
-                    className={`w-full py-2 rounded ${theme === "hacker" ? "bg-red-900/50 text-red-500" : "bg-white/20 text-white"}`}
+                    className={`w-full py-2 rounded ${theme === "hacker" ? "bg-red-900/50 text-red-500" : theme === "bw" ? "bg-white/20 text-white" : "bg-white/20 text-white"}`}
                   >
                     Subscribe
                   </button>
@@ -225,7 +262,7 @@ export function SubscriptionBanner() {
             {activeTab === "enterprise" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div
-                  className={`p-4 border ${theme === "hacker" ? "border-red-500/30" : "border-gray-700"} rounded-md`}
+                  className={`p-4 border ${theme === "hacker" ? "border-red-500/30" : theme === "bw" ? "border-gray-700" : "border-gray-700"} rounded-md`}
                 >
                   <h4 className="font-bold text-lg mb-2">Enterprise Single Seat</h4>
                   <div className="flex items-baseline mb-2">
@@ -249,12 +286,12 @@ export function SubscriptionBanner() {
                   </ul>
                   <div className="flex space-x-2">
                     <button
-                      className={`flex-1 py-2 rounded ${theme === "hacker" ? "bg-red-900/50 text-red-500" : "bg-white/20 text-white"}`}
+                      className={`flex-1 py-2 rounded ${theme === "hacker" ? "bg-red-900/50 text-red-500" : theme === "bw" ? "bg-white/20 text-white" : "bg-white/20 text-white"}`}
                     >
                       Pay Now
                     </button>
                     <button
-                      className={`flex-1 py-2 rounded ${theme === "hacker" ? "bg-green-900/50 text-green-500" : "bg-blue-900/20 text-blue-400"}`}
+                      className={`flex-1 py-2 rounded ${theme === "hacker" ? "bg-green-900/50 text-green-500" : theme === "bw" ? "bg-white/10 text-white" : "bg-blue-900/20 text-blue-400"}`}
                     >
                       Contact Sales
                     </button>
@@ -262,7 +299,7 @@ export function SubscriptionBanner() {
                 </div>
 
                 <div
-                  className={`p-4 border ${theme === "hacker" ? "border-red-500/30" : "border-gray-700"} rounded-md`}
+                  className={`p-4 border ${theme === "hacker" ? "border-red-500/30" : theme === "bw" ? "border-gray-700" : "border-gray-700"} rounded-md`}
                 >
                   <h4 className="font-bold text-lg mb-2">Enterprise Multi-Seat</h4>
                   <div className="flex items-baseline mb-2">
@@ -284,7 +321,7 @@ export function SubscriptionBanner() {
                     </li>
                   </ul>
                   <button
-                    className={`w-full py-2 rounded ${theme === "hacker" ? "bg-green-500 text-black" : "bg-white text-black"}`}
+                    className={`w-full py-2 rounded ${theme === "hacker" ? "bg-green-500 text-black" : theme === "bw" ? "bg-white text-black" : "bg-white text-black"}`}
                   >
                     Contact Sales
                   </button>
@@ -333,12 +370,12 @@ export function SubscriptionBanner() {
                 </ul>
                 <div className="flex space-x-2">
                   <button
-                    className={`flex-1 py-2 rounded ${theme === "hacker" ? "bg-red-900/50 text-red-500" : "bg-white/20 text-white"}`}
+                    className={`flex-1 py-2 rounded ${theme === "hacker" ? "bg-red-900/50 text-red-500" : theme === "bw" ? "bg-white/20 text-white" : "bg-white/20 text-white"}`}
                   >
                     Subscribe
                   </button>
                   <button
-                    className={`flex-1 py-2 rounded ${theme === "hacker" ? "bg-green-900/50 text-green-500" : "bg-blue-900/20 text-blue-400"}`}
+                    className={`flex-1 py-2 rounded ${theme === "hacker" ? "bg-green-900/50 text-green-500" : theme === "bw" ? "bg-white/10 text-white" : "bg-blue-900/20 text-blue-400"}`}
                   >
                     Documentation
                   </button>
@@ -362,7 +399,7 @@ export function SubscriptionBanner() {
       {showReferralModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div
-            className={`bg-gray-900 border ${theme === "hacker" ? "border-red-500" : "border-white"} p-6 rounded-md max-w-md w-full`}
+            className={`bg-gray-900 border ${theme === "hacker" ? "border-red-500" : theme === "bw" ? "border-white" : "border-white"} p-6 rounded-md max-w-md w-full`}
           >
             <h3 className={`${theme === "hacker" ? "text-red-500" : "text-white"} text-lg font-bold mb-4`}>
               Refer a Friend
@@ -379,9 +416,16 @@ export function SubscriptionBanner() {
                   className="bg-gray-800 text-gray-300 text-xs p-2 rounded-l flex-1"
                 />
                 <button
-                  className={`px-3 py-1 rounded-r ${theme === "hacker" ? "bg-green-900 text-green-500" : "bg-blue-900 text-blue-400"}`}
+                  onClick={handleCopyReferralLink}
+                  className={`px-3 py-1 rounded-r ${
+                    theme === "hacker"
+                      ? "bg-green-900 text-green-500"
+                      : theme === "bw"
+                        ? "bg-white/20 text-white"
+                        : "bg-blue-900 text-blue-400"
+                  }`}
                 >
-                  Copy
+                  {referralCopied ? "Copied!" : "Copy"}
                 </button>
               </div>
             </div>
@@ -393,7 +437,18 @@ export function SubscriptionBanner() {
               <li>Access to exclusive content</li>
             </ul>
 
-            <div className="flex justify-end mt-6">
+            <div className="flex justify-between mt-6">
+              <button
+                className={`px-4 py-2 rounded ${
+                  theme === "hacker"
+                    ? "bg-green-900/50 text-green-500"
+                    : theme === "bw"
+                      ? "bg-white/20 text-white"
+                      : "bg-blue-900/20 text-blue-400"
+                }`}
+              >
+                Share via Twitter
+              </button>
               <button className="text-gray-400 hover:text-white" onClick={() => setShowReferralModal(false)}>
                 Close
               </button>
