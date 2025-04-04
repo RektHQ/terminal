@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 "use client"
 
 import { X, Maximize, Minimize, Moon, Sun, LayoutGrid, FileText, Menu, Users, Bot, Monitor } from "lucide-react"

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import type { SecurityPartner, Vulnerability, SecurityReport } from "../types/security"
 
 // Mock security partners
